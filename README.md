@@ -10,7 +10,7 @@ HangHub is a productivity tool that allows you to see users who are working on t
 You can activate HangHub for a specific organization or a repository of your choice.
 
 <p align="center">
-  <img src="https://c.cksource.com/a/1/img/hanghub.gif" alt="Animated presentation of how HangHub works">
+  <img src="https://c.cksource.com/a/2/img/hanghub.gif" alt="Animated presentation of how HangHub works">
 </p>
 
 HangHub was created with ❤️ by [CKEditor team](https://ckeditor.com/). We created HangHub out of our own struggles with GitHub, spending time on the same issues without knowing our teammate was also doing the exact same thing. With HangHub we hope to save your and your teammates’ time and help your productivity!
