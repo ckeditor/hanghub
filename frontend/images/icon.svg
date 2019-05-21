@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="350px" height="350px" viewBox="0 0 350 350" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 54.1 (76490) - https://sketchapp.com -->
+    <title>icon@1x</title>
+    <desc>Created with Sketch.</desc>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(80.224664, 225.821576)" fill="#28B842">
+            <polygon id="Rectangle" transform="translate(61.883342, 62.175591) rotate(-45.000000) translate(-61.883342, -62.175591) " points="-5.52771 42.1546065 129.294395 42.1546065 129.294395 82.1965757 -5.52771 82.1965757"></polygon>
+            <polygon id="Rectangle" transform="translate(128.903019, 62.175591) rotate(-135.000000) translate(-128.903019, -62.175591) " points="61.4919666 42.1546065 196.314071 42.1546065 196.314071 82.1965757 61.4919666 82.1965757"></polygon>
+        </g>
+        <g id="Group" transform="translate(80.224664, -0.000000)" fill="#28B842">
+            <polygon id="Rectangle" transform="translate(61.883342, 62.002833) scale(1, -1) rotate(-45.000000) translate(-61.883342, -62.002833) " points="-5.52771 41.9818482 129.294395 41.9818482 129.294395 82.0238174 -5.52771 82.0238174"></polygon>
+            <polygon id="Rectangle" transform="translate(128.903019, 62.002833) scale(1, -1) rotate(-135.000000) translate(-128.903019, -62.002833) " points="61.4919666 41.9818482 196.314071 41.9818482 196.314071 82.0238174 61.4919666 82.0238174"></polygon>
+        </g>
+        <g id="Group" transform="translate(225.821576, 79.799395)" fill="#28B842">
+            <polygon id="Rectangle" transform="translate(62.175591, 129.487516) rotate(-135.000000) translate(-62.175591, -129.487516) " points="-5.2354613 109.466532 129.586644 109.466532 129.586644 149.508501 -5.2354613 149.508501"></polygon>
+            <polygon id="Rectangle" transform="translate(62.175591, 62.467840) rotate(-225.000000) translate(-62.175591, -62.467840) " points="-5.2354613 42.4468552 129.586644 42.4468552 129.586644 82.4888244 -5.2354613 82.4888244"></polygon>
+        </g>
+        <g id="Group" transform="translate(-0.000000, 79.799395)" fill="#032A0A">
+            <polygon id="Rectangle" transform="translate(62.002833, 61.883342) rotate(45.000000) translate(-62.002833, -61.883342) " points="-5.40821958 41.8623578 129.413885 41.8623578 129.413885 81.904327 -5.40821958 81.904327"></polygon>
+            <polygon id="Rectangle" transform="translate(62.002833, 128.903019) rotate(-45.000000) translate(-62.002833, -128.903019) " points="-5.40821958 108.882034 129.413885 108.882034 129.413885 148.924004 -5.40821958 148.924004"></polygon>
+        </g>
+    </g>
+</svg>
