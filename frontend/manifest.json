@@ -1,12 +1,12 @@
 {
   "name": "HangHub",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "HangHub allows you to see who is viewing or commenting on the same GitHub issue or pull request as you in real time.",
   "permissions": [
     "activeTab",
     "tabs",
     "storage",
-    "*://hanghub.herokuapp.com/*"
+    "*://hanghub.cksource.com/*"
   ],
   "content_scripts": [
     {
@@ -26,7 +26,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "browser-extensions@cksource.com"
+      "id": "hanghub@cksource.com"
     }
   },
   "manifest_version": 2

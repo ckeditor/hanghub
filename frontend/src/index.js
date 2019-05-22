@@ -5,7 +5,7 @@
 
 import HangHub from './HangHub';
 
-const SOCKET_URL = 'https://hanghub.herokuapp.com/'; // You can replace it with your own server.
+const SOCKET_URL = 'https://hanghub.cksource.com/'; // You can replace it with your own server.
 const url = new URL( window.location.href );
 const urlParts = url.pathname.split( '/' );
 const organization = urlParts[ 1 ];
