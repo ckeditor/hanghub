@@ -19,7 +19,7 @@ HangHub was created with ❤️ by [CKEditor team](https://ckeditor.com/). We cr
 
 ### Use the official browser extension
 
-HangHub is available as a browser extension in Chrome web store and Firefox Add-ons.
+HangHub is available as a browser extension in [Chrome web store](https://chrome.google.com/webstore/detail/hanghub/egnoioofamlapfbecfkjgeobkfmfflfo) and [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/hanghub/).
 
 ### Build your own version
 
