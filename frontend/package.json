@@ -1,6 +1,7 @@
 {
-  "name": "HangHub",
+  "name": "hang-hub-frontend",
   "version": "1.0.1",
+  "private": true,
   "description": "HangHub is a productivity tool that allows you to see users who are working on the same GitHub issue as you. It is available as a browser extension for Chrome and Firefox.",
   "main": "src/index.js",
   "scripts": {
