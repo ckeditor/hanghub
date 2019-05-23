@@ -23,5 +23,8 @@ module.exports = {
     react: {
       version: '16.3'
     }
+  },
+  rules: {
+    'react/prop-types': 'off'
   }
 };

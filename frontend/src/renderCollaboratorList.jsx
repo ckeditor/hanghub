@@ -6,40 +6,40 @@
 import React, { render } from 'preact-compat';
 
 export default function renderCollaboratorList( container, users, pageType ) {
-	render(<CollaboratorList pageType={ pageType } users={ users } />, container);
+	render( <CollaboratorList pageType={ pageType } users={ users } />, container );
 }
 
-function CollaboratorList ({ users, pageType }) {
-    return (
-        <div>
-	        <div className="text-bold discussion-sidebar-heading" >
-		        { users.length ? `Also on this ${ getPageType( pageType ) }` : 'No other users connected' }
-	        </div>
-	        { users.map( user =>
-		        <Collaborator user={ user } />
-		    ) }
-        </div>
-    );
+function CollaboratorList( { users, pageType } ) {
+	return (
+		<div>
+			<div className="text-bold discussion-sidebar-heading" >
+				{ users.length ? `Also on this ${ getPageType( pageType ) }` : 'No other users connected' }
+			</div>
+			{ users.map( user =>
+				<Collaborator user={ user } key={ user.id } />
+			) }
+		</div>
+	);
+}
 
-	function getPageType( pageType ) {
-		return pageType === 'issues' ? 'issue' : 'pull request';
-	}
+function Collaborator( { user } ) {
+	return (
+		<span key={ user.id } className="css-truncate js-issue-assignees sidebar-assignee">
+			<p>
+				<span className="js-hovercard-left" data-hovercard-type="user" data-hovercard-url={ user.id ? `/hovercards?user_id=${ user.id }` : null } data-assignee-name={ user.login }>
+					<a className="no-underline" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href={ '/' + user.login } aria-describedby="hovercard-aria-description">
+						<img className="avatar" src={ user.avatar } width="20" height="20" alt={ user.login } />
+					</a>
+					<a className="assignee link-gray-dark" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href={ '/' + user.login } aria-describedby="hovercard-aria-description">
+						<span className="css-truncate-target">&nbsp;{ user.login }&nbsp;</span>
+						<span className="css-truncate-target" style={ { fontWeight: 'normal' } }>is { user.state }</span>
+					</a>
+				</span>
+			</p>
+		</span>
+	);
+}
 
-	function Collaborator({ user }) {
-		return(
-			<span key={ user.id } className="css-truncate js-issue-assignees sidebar-assignee">
-				<p>
-					<span className="js-hovercard-left" data-hovercard-type="user" data-hovercard-url={ user.id ? `/hovercards?user_id=${ user.id }` : null } data-assignee-name={ user.login }>
-						<a className="no-underline" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href={ "/" + user.login } aria-describedby="hovercard-aria-description">
-							<img className="avatar" src={ user.avatar } width="20" height="20" alt={ user.login } />
-						</a>
-						<a className="assignee link-gray-dark" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href={ "/" + user.login } aria-describedby="hovercard-aria-description">
-							<span className="css-truncate-target">&nbsp;{ user.login }&nbsp;</span>
-							<span className="css-truncate-target" style={{ fontWeight: 'normal' }}>is { user.state }</span>
-						</a>
-					</span>
-				</p>
-			</span>
-		)
-	}
+function getPageType( pageType ) {
+	return pageType === 'issues' ? 'issue' : 'pull request';
 }
