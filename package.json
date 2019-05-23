@@ -2,18 +2,30 @@
   "name": "hang-hub",
   "version": "0.0.1",
   "private": true,
-  "description": "",
+  "description": "HangHub is a productivity tool that allows you to see users who are working on the same GitHub issue as you. It is available as a browser extension for Chrome and Firefox.",
   "author": "CKSource (http://cksource.com/)",
   "license": "MIT",
-  "dependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-ckeditor5": "^1.0.14",
-    "eslint-plugin-react": "^7.13.0"
-  },
   "scripts": {
     "lint": "npx eslint --quiet '**/*.+(js|jsx)'"
   },
+  "dependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-ckeditor5": "^1.0.14",
+    "eslint-plugin-react": "^7.13.0",
+    "husky": "^2.3.0",
+    "lint-staged": "^8.1.7"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.+(js|jsx)": [
+      "eslint --quiet"
+    ]
+  },
   "eslintIgnore": [
-    "**/node_modules"
+    "**/node_modules/**"
   ]
 }
