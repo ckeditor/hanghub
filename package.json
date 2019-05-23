@@ -6,7 +6,7 @@
   "author": "CKSource (http://cksource.com/)",
   "license": "MIT",
   "scripts": {
-    "lint": "npx eslint --quiet '**/*.+(js|jsx)'"
+    "lint": "eslint --quiet '**/*.+(js|jsx)'"
   },
   "dependencies": {
     "eslint": "^5.16.0",
@@ -26,6 +26,7 @@
     ]
   },
   "eslintIgnore": [
-    "**/node_modules/**"
+    "**/node_modules/**",
+    "**/build/**"
   ]
 }
