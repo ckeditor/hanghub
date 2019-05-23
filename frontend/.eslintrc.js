@@ -6,22 +6,12 @@
 /* eslint-env node */
 
 module.exports = {
-  extends: [
-    'ckeditor5',
-    'plugin:react/recommended'
-  ],
-  parserOptions: {
-    ecmaVersion: 2018,
-    ecmaFeatures: {
-      jsx: true
-    }
-  },
+  extends: '../.eslintrc.js',
   env: {
-    mocha: false
+    browser: true,
+    webextensions: true
   },
-  settings: {
-    react: {
-      version: '16.3'
-    }
+  rules: {
+    'max-len': 'off'
   }
-};
+}

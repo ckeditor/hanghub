@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-ckeditor5": "^1.0.14",
+    "eslint-plugin-react": "^7.13.0"
+  },
+  "scripts": {
+    "lint": "npx eslint --quiet '**/*.+(js|jsx)'"
+  },
+  "eslintIgnore": [
+    "**/node_modules"
+  ]
+}
