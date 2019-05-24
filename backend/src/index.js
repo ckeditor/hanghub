@@ -9,7 +9,7 @@
 const PORT = process.env.PORT || 3000;
 
 const app = require( 'express' )();
-const { promisify } = require('util');
+const { promisify } = require( 'util' );
 const http = require( 'http' ).Server( app );
 const io = require( 'socket.io' )( http );
 const Redis = require( 'ioredis' );
@@ -43,14 +43,14 @@ io.on( 'connection', socket => {
 			socket.session.issues.push( issueKey );
 		}
 
-		const issueUsers = fetchMap( JSON.parse( await getAsync( issueKey )) );
-		console.log( issueUsers );
+		const issueUsers = fetchMap( JSON.parse( await getAsync( issueKey ) ) );
+
 		if ( !issueUsers.has( message.user.login ) ) {
 			issueUsers.set( message.user.login, { sockets: [], tabs: new Map(), joinedAt: timestamp } );
 		}
 
 		const issueUser = await issueUsers.get( message.user.login );
-		console.log([...issueUser.tabs])
+
 		if ( !issueUser.sockets.includes( socket.id ) ) {
 			socket.session.login = message.user.login;
 
@@ -58,12 +58,18 @@ io.on( 'connection', socket => {
 
 			issueUser.sockets.push( socket.id );
 		}
-
-		issueUser.tabs.set( socket.id, message.user.state );
+		issueUser.tabs = fetchMap( issueUser.tabs );
+		await issueUser.tabs.set( socket.id, message.user.state );
 
 		issueUser.user = message.user;
 
 		const users = getUsers( issueUsers );
+
+		for ( const user of [ ...issueUsers.values() ] ) {
+			user.tabs = storeMap( user.tabs );
+		}
+
+		await setAsync( issueKey, JSON.stringify( storeMap( issueUsers ) ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -86,9 +92,11 @@ io.on( 'connection', socket => {
 	} );
 
 	async function removeUser( issueKey ) {
-		const issueUsers = fetchMap( JSON.parse( await getAsync( issueKey ) ) );
+		let issueUsers = await getAsync( issueKey );
 
-		if ( !issueUsers ) {
+		if ( issueUsers ) {
+			issueUsers = fetchMap( JSON.parse( issueUsers ) );
+		} else {
 			return;
 		}
 
@@ -101,6 +109,8 @@ io.on( 'connection', socket => {
 		if ( !issueUser.sockets.includes( socket.id ) ) {
 			return;
 		}
+
+		issueUser.tabs = fetchMap( issueUser.tabs );
 
 		if ( issueUser.tabs.has( socket.id ) ) {
 			issueUser.tabs.delete( socket.id );
@@ -160,6 +170,9 @@ function fetchMap( object ) {
 }
 function storeMap( map ) {
 	const object = {};
-	map.forEach((value,key) => { object[key] = value });
+	for ( const [ key, value ] of map ) {
+		object[ key ] = value;
+	}
+
 	return object;
 }
