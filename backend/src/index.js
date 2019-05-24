@@ -9,10 +9,16 @@
 const PORT = process.env.PORT || 3000;
 
 const app = require( 'express' )();
+const { promisify } = require('util');
 const http = require( 'http' ).Server( app );
 const io = require( 'socket.io' )( http );
+const Redis = require( 'ioredis' );
+const redisAdapter = require( 'socket.io-redis' );
+io.adapter( redisAdapter( { host: 'localhost', port: 6379 } ) );
 
-const db = new Map();
+const client = new Redis();
+const getAsync = promisify( client.get ).bind( client );
+const setAsync = promisify( client.set ).bind( client );
 
 // Priorities are set from the lowest to the highest.
 const statePriorities = [ 'away', 'viewing', 'typing', 'editing', 'merging' ];
@@ -22,10 +28,11 @@ io.on( 'connection', socket => {
 
 	const timestamp = new Date();
 
-	socket.on( 'setUser', ( message, reply ) => {
+	socket.on( 'setUser', async( message, reply ) => {
 		const issueKey = `${ message.repoName }:${ message.issueId }`;
-		if ( !db.has( issueKey ) ) {
-			db.set( issueKey, new Map() );
+
+		if ( !await getAsync( issueKey ) ) {
+			await setAsync( issueKey, '{}' );
 		}
 
 		if ( !socket.session.issues ) {
@@ -36,14 +43,14 @@ io.on( 'connection', socket => {
 			socket.session.issues.push( issueKey );
 		}
 
-		const issueUsers = db.get( issueKey );
-
+		const issueUsers = fetchMap( JSON.parse( await getAsync( issueKey )) );
+		console.log( issueUsers );
 		if ( !issueUsers.has( message.user.login ) ) {
 			issueUsers.set( message.user.login, { sockets: [], tabs: new Map(), joinedAt: timestamp } );
 		}
 
-		const issueUser = issueUsers.get( message.user.login );
-
+		const issueUser = await issueUsers.get( message.user.login );
+		console.log([...issueUser.tabs])
 		if ( !issueUser.sockets.includes( socket.id ) ) {
 			socket.session.login = message.user.login;
 
@@ -63,28 +70,29 @@ io.on( 'connection', socket => {
 		reply( null, users );
 	} );
 
-	socket.on( 'removeUser', message => {
+	socket.on( 'removeUser', async message => {
 		const issueKey = `${ message.repoName }:${ message.issueId }`;
 
-		removeUser( issueKey );
+		await removeUser( issueKey );
 	} );
 
-	socket.on( 'disconnect', () => {
+	socket.on( 'disconnect', async() => {
 		for ( const issueKey of socket.session.issues || [] ) {
-			removeUser( issueKey );
+			await removeUser( issueKey );
 		}
 
 		delete socket.issues;
+		delete socket.issues;
 	} );
 
-	function removeUser( issueKey ) {
-		const issueUsers = db.get( issueKey );
+	async function removeUser( issueKey ) {
+		const issueUsers = fetchMap( JSON.parse( await getAsync( issueKey ) ) );
 
 		if ( !issueUsers ) {
 			return;
 		}
 
-		const issueUser = issueUsers.get( socket.session.login );
+		const issueUser = await issueUsers.get( socket.session.login );
 
 		if ( !issueUser ) {
 			return;
@@ -141,4 +149,17 @@ function chooseMostImportantState( states ) {
 	}
 
 	return statePriorities[ mostImportantStateIndex ];
+}
+
+function fetchMap( object ) {
+	const map = new Map();
+	Object.keys( object ).forEach( key => {
+		map.set( key, object[ key ] );
+	} );
+	return map;
+}
+function storeMap( map ) {
+	const object = {};
+	map.forEach((value,key) => { object[key] = value });
+	return object;
 }
