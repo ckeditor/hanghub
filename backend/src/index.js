@@ -163,13 +163,17 @@ function chooseMostImportantState( states ) {
 
 function fetchMap( object ) {
 	const map = new Map();
-	Object.keys( object ).forEach( key => {
+
+	for ( const key of Object.keys( object ) ) {
 		map.set( key, object[ key ] );
-	} );
+	}
+
 	return map;
 }
+
 function storeMap( map ) {
 	const object = {};
+
 	for ( const [ key, value ] of map ) {
 		object[ key ] = value;
 	}
