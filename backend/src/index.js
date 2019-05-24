@@ -102,11 +102,7 @@ io.on( 'connection', socket => {
 
 		const issueUser = await issueUsers.get( socket.session.login );
 
-		if ( !issueUser ) {
-			return;
-		}
-
-		if ( !issueUser.sockets.includes( socket.id ) ) {
+		if ( !issueUser || !issueUser.sockets.includes( socket.id ) ) {
 			return;
 		}
 
