@@ -3,14 +3,14 @@
  * This file is licensed under the terms of the MIT License (see LICENSE.md).
  */
 
-/* eslint-env node */
 'use strict';
 
 const PORT = process.env.PORT || 3000;
 
 const app = require( 'express' )();
 const { promisify } = require( 'util' );
-const http = require( 'http' ).Server( app );
+const { Server } = require( 'http' );
+const http = new Server( app );
 const io = require( 'socket.io' )( http );
 const Redis = require( 'ioredis' );
 const redisAdapter = require( 'socket.io-redis' );
@@ -21,14 +21,14 @@ const fetchUsers = promisify( client.get ).bind( client );
 const storeUsers = promisify( client.set ).bind( client );
 
 // Priorities are set from the lowest to the highest.
-const statePriorities = [ 'away', 'viewing', 'typing', 'editing', 'merging' ];
+const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
 
 io.on( 'connection', socket => {
 	socket.session = {};
 
 	const timestamp = new Date();
 
-	socket.on( 'setUser', async( message, reply ) => {
+	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
 		const issueUsers = JSON.parse( await fetchUsers( issueKey ) || '{}' );
 
@@ -73,7 +73,7 @@ io.on( 'connection', socket => {
 		await removeUser( issueKey );
 	} );
 
-	socket.on( 'disconnect', async() => {
+	socket.on( 'disconnect', async () => {
 		for ( const issueKey of socket.session.issues || [] ) {
 			await removeUser( issueKey );
 		}

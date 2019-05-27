@@ -1,17 +1,14 @@
 {
-  "name": "HangHub-backend",
-  "version": "1.0.0",
-  "description": "",
+  "name": "hanghub-backend",
+  "version": "0.0.1",
+  "private": true,
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "lint": "eslint ./src"
+    "start": "node src/index.js"
   },
   "author": "CKSource (http://cksource.com/)",
   "license": "MIT",
   "dependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-ckeditor5": "^1.0.14",
     "express": "^4.16.4",
     "ioredis": "^4.9.5",
     "socket.io": "^2.2.0",
