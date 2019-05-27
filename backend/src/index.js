@@ -58,6 +58,7 @@ io.on( 'connection', socket => {
 
 			issueUser.sockets.push( socket.id );
 		}
+
 		issueUser.tabs[ socket.id ] = message.user.state;
 
 		issueUser.user = message.user;
@@ -129,11 +130,11 @@ function sortByDate( prev, next ) {
 }
 
 function getUsers( issueUsers ) {
-	return [ ...Object.values( issueUsers ) ]
+	return Object.values( issueUsers )
 		.sort( sortByDate )
 		.map( issueUser => ( Object.assign( {},
 			issueUser.user,
-			{ state: chooseMostImportantState( [ ...Object.values( issueUser.tabs ) ] ) }
+			{ state: chooseMostImportantState( Object.values( issueUser.tabs ) ) }
 		) ) );
 }
 
