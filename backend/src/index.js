@@ -38,17 +38,15 @@ io.on( 'connection', socket => {
 		}
 
 		if ( !issueUsers.hasOwnProperty( message.user.login ) ) {
-			issueUsers[ message.user.login ] = { sockets: [], tabs: {}, joinedAt: timestamp };
+			issueUsers[ message.user.login ] = { tabs: {}, joinedAt: timestamp };
 		}
 
 		const issueUser = issueUsers[ message.user.login ];
 
-		if ( !issueUser.sockets.includes( socket.id ) ) {
+		if ( !Object.keys( issueUser.tabs ).includes( socket.id ) ) {
 			socket.session.login = message.user.login;
 
 			socket.join( issueKey );
-
-			issueUser.sockets.push( socket.id );
 		}
 
 		issueUser.tabs[ socket.id ] = message.user.state;
@@ -82,7 +80,7 @@ io.on( 'connection', socket => {
 		const issueUsers = JSON.parse( await client.get( issueKey ) || '{}' );
 		const issueUser = issueUsers[ socket.session.login ];
 
-		if ( !issueUser || !issueUser.sockets.includes( socket.id ) ) {
+		if ( !issueUser || !Object.keys( issueUser.tabs ).includes( socket.id ) ) {
 			return;
 		}
 
@@ -90,9 +88,7 @@ io.on( 'connection', socket => {
 			delete issueUser.tabs[ socket.id ];
 		}
 
-		issueUser.sockets = issueUser.sockets.filter( socketId => socketId !== socket.id );
-
-		if ( issueUser.sockets.length ) {
+		if ( Object.keys( issueUser.tabs ).length ) {
 			return;
 		}
 
