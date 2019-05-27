@@ -97,7 +97,7 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueUsers );
 
-		await client.hset( issueKey, socket.session.login, JSON.stringify( issueUsers ) );
+		await client.hset( issueKey, socket.session.login, JSON.stringify( issueUser ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
