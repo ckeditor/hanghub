@@ -29,12 +29,8 @@ io.on( 'connection', socket => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
 		const issueUsers = getUsersFromDatabase( issueKey );
 
-		if ( !socket.session.issues ) {
-			socket.session.issues = [];
-		}
-
-		if ( !socket.session.issues.includes( issueKey ) ) {
-			socket.session.issues.push( issueKey );
+		if ( !socket.session.issueKey ) {
+			socket.session.issueKey = issueKey;
 		}
 
 		if ( !issueUsers.hasOwnProperty( message.user.login ) ) {
@@ -50,7 +46,6 @@ io.on( 'connection', socket => {
 		}
 
 		issueUser.tabs[ socket.id ] = message.user.state;
-
 		issueUser.user = message.user;
 
 		const users = getUsers( issueUsers );
@@ -69,11 +64,7 @@ io.on( 'connection', socket => {
 	} );
 
 	socket.on( 'disconnect', async () => {
-		for ( const issueKey of socket.session.issues || [] ) {
-			await removeUser( issueKey );
-		}
-
-		delete socket.issues;
+		await removeUser( socket.session.issueKey );
 	} );
 
 	async function removeUser( issueKey ) {
