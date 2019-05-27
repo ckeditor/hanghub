@@ -29,8 +29,8 @@ io.on( 'connection', socket => {
 	const timestamp = new Date();
 
 	socket.on( 'setUser', async( message, reply ) => {
-		const issueKey = `${ message.repoName }:${ message.issueId }`;
-		const issueUsers = JSON.parse( await fetchUsers( issueKey ) ) || {};
+		const issueKey = createIssueKey( message.repoName, message.issueId );
+		const issueUsers = JSON.parse( await fetchUsers( issueKey ) || '{}' );
 
 		if ( !socket.session.issues ) {
 			socket.session.issues = [];
@@ -68,7 +68,7 @@ io.on( 'connection', socket => {
 	} );
 
 	socket.on( 'removeUser', async message => {
-		const issueKey = `${ message.repoName }:${ message.issueId }`;
+		const issueKey = createIssueKey( message.repoName, message.issueId );
 
 		await removeUser( issueKey );
 	} );
@@ -82,9 +82,9 @@ io.on( 'connection', socket => {
 	} );
 
 	async function removeUser( issueKey ) {
-		const issueUsers = JSON.parse( await fetchUsers( issueKey ) );
+		const issueUsers = JSON.parse( await fetchUsers( issueKey ) || '{}' );
 
-		if ( !issueUsers ) {
+		if ( Object.keys( issueUsers ).length === 0 ) {
 			return;
 		}
 
@@ -141,4 +141,8 @@ function chooseMostImportantState( states ) {
 	}
 
 	return statePriorities[ mostImportantStateIndex ];
+}
+
+function createIssueKey( repoName, issueId ) {
+	return `${ repoName }:${ issueId }`;
 }
