@@ -27,7 +27,7 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
-		const issueUsers = JSON.parse( await client.get( issueKey ) || '{}' );
+		const issueUsers = getUsersFromDatabase( issueKey );
 
 		if ( !socket.session.issues ) {
 			socket.session.issues = [];
@@ -43,7 +43,7 @@ io.on( 'connection', socket => {
 
 		const issueUser = issueUsers[ message.user.login ];
 
-		if ( !Object.keys( issueUser.tabs ).includes( socket.id ) ) {
+		if ( !issueUser.tabs.hasOwnProperty( socket.id ) ) {
 			socket.session.login = message.user.login;
 
 			socket.join( issueKey );
@@ -55,7 +55,7 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueUsers );
 
-		await client.set( issueKey, JSON.stringify( issueUsers ) );
+		await client.hset( issueKey, message.user.login, JSON.stringify( issueUser ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -77,10 +77,11 @@ io.on( 'connection', socket => {
 	} );
 
 	async function removeUser( issueKey ) {
-		const issueUsers = JSON.parse( await client.get( issueKey ) || '{}' );
+		const issueUsers = getUsersFromDatabase( issueKey );
+
 		const issueUser = issueUsers[ socket.session.login ];
 
-		if ( !issueUser || !Object.keys( issueUser.tabs ).includes( socket.id ) ) {
+		if ( !issueUser || issueUser.tabs.hasOwnProperty( socket.id ) ) {
 			return;
 		}
 
@@ -96,7 +97,7 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueUsers );
 
-		await client.set( issueKey, JSON.stringify( issueUsers ) );
+		await client.hset( issueKey, socket.session.login, JSON.stringify( issueUsers ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -135,4 +136,15 @@ function chooseMostImportantState( states ) {
 
 function createIssueKey( repoName, issueId ) {
 	return `${ repoName }:${ issueId }`;
+}
+
+async function getUsersFromDatabase( issueKey ) {
+	const issueUsers = {};
+	const response = await client.hgetall( issueKey );
+
+	for ( const user in response ) {
+		issueUsers[ user ] = JSON.parse( response[ user ] );
+	}
+
+	return issueUsers;
 }
