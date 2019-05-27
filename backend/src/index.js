@@ -43,13 +43,13 @@ io.on( 'connection', socket => {
 			socket.session.issues.push( issueKey );
 		}
 
-		const issueUsers = fetchMap( JSON.parse( await getAsync( issueKey ) ) );
+		const issueUsers = JSON.parse( await getAsync( issueKey ) );
 
-		if ( !issueUsers.has( message.user.login ) ) {
-			issueUsers.set( message.user.login, { sockets: [], tabs: new Map(), joinedAt: timestamp } );
+		if ( !issueUsers.hasOwnProperty( message.user.login ) ) {
+			issueUsers[ message.user.login ] = { sockets: [], tabs: new Map(), joinedAt: timestamp };
 		}
 
-		const issueUser = await issueUsers.get( message.user.login );
+		const issueUser = issueUsers[ message.user.login ];
 
 		if ( !issueUser.sockets.includes( socket.id ) ) {
 			socket.session.login = message.user.login;
@@ -58,18 +58,13 @@ io.on( 'connection', socket => {
 
 			issueUser.sockets.push( socket.id );
 		}
-		issueUser.tabs = fetchMap( issueUser.tabs );
-		await issueUser.tabs.set( socket.id, message.user.state );
+		issueUser.tabs[ socket.id ] = message.user.state;
 
 		issueUser.user = message.user;
 
 		const users = getUsers( issueUsers );
 
-		for ( const user of [ ...issueUsers.values() ] ) {
-			user.tabs = storeMap( user.tabs );
-		}
-
-		await setAsync( issueKey, JSON.stringify( storeMap( issueUsers ) ) );
+		await setAsync( issueKey, JSON.stringify( issueUsers ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -88,28 +83,25 @@ io.on( 'connection', socket => {
 		}
 
 		delete socket.issues;
-		delete socket.issues;
 	} );
 
 	async function removeUser( issueKey ) {
 		let issueUsers = await getAsync( issueKey );
 
 		if ( issueUsers ) {
-			issueUsers = fetchMap( JSON.parse( issueUsers ) );
+			issueUsers = JSON.parse( issueUsers );
 		} else {
 			return;
 		}
 
-		const issueUser = await issueUsers.get( socket.session.login );
+		const issueUser = issueUsers[ socket.session.login ];
 
 		if ( !issueUser || !issueUser.sockets.includes( socket.id ) ) {
 			return;
 		}
 
-		issueUser.tabs = fetchMap( issueUser.tabs );
-
-		if ( issueUser.tabs.has( socket.id ) ) {
-			issueUser.tabs.delete( socket.id );
+		if ( issueUser.tabs.hasOwnProperty( socket.id ) ) {
+			delete issueUser.tabs[ socket.id ];
 		}
 
 		issueUser.sockets = issueUser.sockets.filter( socketId => socketId !== socket.id );
@@ -118,7 +110,7 @@ io.on( 'connection', socket => {
 			return;
 		}
 
-		issueUsers.delete( socket.session.login );
+		delete issueUsers[ socket.session.login ];
 
 		const users = getUsers( issueUsers );
 
@@ -137,11 +129,11 @@ function sortByDate( prev, next ) {
 }
 
 function getUsers( issueUsers ) {
-	return [ ...issueUsers.values() ]
+	return [ ...Object.values( issueUsers ) ]
 		.sort( sortByDate )
 		.map( issueUser => ( Object.assign( {},
 			issueUser.user,
-			{ state: chooseMostImportantState( [ ...issueUser.tabs.values() ] ) }
+			{ state: chooseMostImportantState( [ ...Object.values( issueUser.tabs ) ] ) }
 		) ) );
 }
 
@@ -155,24 +147,4 @@ function chooseMostImportantState( states ) {
 	}
 
 	return statePriorities[ mostImportantStateIndex ];
-}
-
-function fetchMap( object ) {
-	const map = new Map();
-
-	for ( const key of Object.keys( object ) ) {
-		map.set( key, object[ key ] );
-	}
-
-	return map;
-}
-
-function storeMap( map ) {
-	const object = {};
-
-	for ( const [ key, value ] of map ) {
-		object[ key ] = value;
-	}
-
-	return object;
 }
