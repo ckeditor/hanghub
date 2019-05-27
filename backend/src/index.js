@@ -15,7 +15,7 @@ const io = require( 'socket.io' )( http );
 const db = new Map();
 
 // Priorities are set from the lowest to the highest.
-const statePriorities = [ 'away', 'viewing', 'typing', 'editing', 'merging' ];
+const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
 
 io.on( 'connection', socket => {
 	socket.session = {};
