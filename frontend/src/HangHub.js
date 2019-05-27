@@ -186,14 +186,14 @@ export default class HangHub {
 			return 'merging';
 		} else if ( this._isUserEditingComment() ) {
 			return 'editing';
-		} else if ( this._isUserTypingNewComment() ) {
-			return 'typing';
+		} else if ( this._isUserCommenting() ) {
+			return 'commenting';
 		} else {
 			return 'viewing';
 		}
 	}
 
-	_isUserTypingNewComment() {
+	_isUserCommenting() {
 		const newCommentField = document.querySelector( '#new_comment_field' );
 		const newInlineCommentElements = document.querySelectorAll( 'textarea[id*="new_inline_comment_discussion"]' );
 
