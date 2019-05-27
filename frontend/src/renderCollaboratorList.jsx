@@ -24,7 +24,7 @@ function CollaboratorList( { users, pageType } ) {
 
 function Collaborator( { user } ) {
 	return (
-		<span key={ user.id } className="css-truncate js-issue-assignees sidebar-assignee">
+		<span className="css-truncate js-issue-assignees sidebar-assignee">
 			<p>
 				<span className="js-hovercard-left" data-hovercard-type="user" data-hovercard-url={ user.id ? `/hovercards?user_id=${ user.id }` : null } data-assignee-name={ user.login }>
 					<a className="no-underline" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href={ '/' + user.login } aria-describedby="hovercard-aria-description">
