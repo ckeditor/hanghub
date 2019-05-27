@@ -25,6 +25,16 @@ module.exports = {
     }
   },
   rules: {
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
+
+    // See https://github.com/ckeditor/ckeditor5-dev/issues/521.
+    'space-before-function-paren': [
+      'error',
+      {
+        anonymous: 'never',
+        named: 'never',
+        asyncArrow: 'always'
+      }
+    ]
   }
 };
