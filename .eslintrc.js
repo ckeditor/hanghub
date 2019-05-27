@@ -6,15 +6,35 @@
 /* eslint-env node */
 
 module.exports = {
-    extends: "ckeditor5",
-    env: {
-        "browser": true,
-        "webextensions": true
-    },
-    rules: {
-        'max-len': 'off'
-    },
-    parserOptions: {
-        ecmaVersion: 2018,
+  extends: [
+    'ckeditor5',
+    'plugin:react/recommended'
+  ],
+  parserOptions: {
+    ecmaVersion: 2018,
+    ecmaFeatures: {
+      jsx: true
     }
+  },
+  env: {
+    mocha: false
+  },
+  settings: {
+    react: {
+      version: '16.3'
+    }
+  },
+  rules: {
+    'react/prop-types': 'off',
+
+    // See https://github.com/ckeditor/ckeditor5-dev/issues/521.
+    'space-before-function-paren': [
+      'error',
+      {
+        anonymous: 'never',
+        named: 'never',
+        asyncArrow: 'always'
+      }
+    ]
+  }
 };

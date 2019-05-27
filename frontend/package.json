@@ -1,14 +1,12 @@
 {
-  "name": "HangHub",
-  "version": "1.0.1",
-  "description": "HangHub is a productivity tool that allows you to see users who are working on the same GitHub issue as you. It is available as a browser extension for Chrome and Firefox.",
-  "main": "src/index.js",
-  "scripts": {
-    "build": "webpack --mode=production",
-    "lint": "eslint ./src"
-  },
+  "name": "hanghub-frontend",
+  "version": "0.0.1",
+  "private": true,
   "author": "CKSource (http://cksource.com/)",
   "license": "MIT",
+  "scripts": {
+    "build": "webpack --mode=production"
+  },
   "dependencies": {
     "@babel/core": "^7.4.3",
     "@babel/plugin-syntax-jsx": "^7.2.0",
@@ -17,8 +15,6 @@
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.5",
     "copy-webpack-plugin": "^5.0.3",
-    "eslint": "^5.16.0",
-    "eslint-config-ckeditor5": "^1.0.14",
     "lodash.debounce": "^4.0.8",
     "preact": "^8.4.2",
     "preact-compat": "^3.18.5",

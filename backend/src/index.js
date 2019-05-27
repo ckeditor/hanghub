@@ -3,13 +3,13 @@
  * This file is licensed under the terms of the MIT License (see LICENSE.md).
  */
 
-/* eslint-env node */
 'use strict';
 
 const PORT = process.env.PORT || 3000;
 
 const app = require( 'express' )();
-const http = require( 'http' ).Server( app );
+const { Server } = require( 'http' );
+const http = new Server( app );
 const io = require( 'socket.io' )( http );
 
 const db = new Map();
