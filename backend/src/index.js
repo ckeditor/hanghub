@@ -108,6 +108,8 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueUsers );
 
+		await storeUsers( issueKey, JSON.stringify( issueUsers ) );
+
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
 		socket.leave( issueKey );
