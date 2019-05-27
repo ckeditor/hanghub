@@ -46,7 +46,7 @@ io.on( 'connection', socket => {
 		const issueUsers = JSON.parse( await getAsync( issueKey ) );
 
 		if ( !issueUsers.hasOwnProperty( message.user.login ) ) {
-			issueUsers[ message.user.login ] = { sockets: [], tabs: new Map(), joinedAt: timestamp };
+			issueUsers[ message.user.login ] = { sockets: [], tabs: {}, joinedAt: timestamp };
 		}
 
 		const issueUser = issueUsers[ message.user.login ];
