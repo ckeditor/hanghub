@@ -8,7 +8,6 @@
 const PORT = process.env.PORT || 3000;
 
 const app = require( 'express' )();
-const { promisify } = require( 'util' );
 const { Server } = require( 'http' );
 const http = new Server( app );
 const io = require( 'socket.io' )( http );
@@ -17,8 +16,6 @@ const redisAdapter = require( 'socket.io-redis' );
 io.adapter( redisAdapter( { host: 'localhost', port: 6379 } ) );
 
 const client = new Redis();
-const fetchUsers = promisify( client.get ).bind( client );
-const storeUsers = promisify( client.set ).bind( client );
 
 // Priorities are set from the lowest to the highest.
 const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
@@ -30,7 +27,7 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
-		const issueUsers = JSON.parse( await fetchUsers( issueKey ) || '{}' );
+		const issueUsers = JSON.parse( await client.get( issueKey ) || '{}' );
 
 		if ( !socket.session.issues ) {
 			socket.session.issues = [];
@@ -60,7 +57,7 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueUsers );
 
-		await storeUsers( issueKey, JSON.stringify( issueUsers ) );
+		await client.set( issueKey, JSON.stringify( issueUsers ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -82,7 +79,7 @@ io.on( 'connection', socket => {
 	} );
 
 	async function removeUser( issueKey ) {
-		const issueUsers = JSON.parse( await fetchUsers( issueKey ) || '{}' );
+		const issueUsers = JSON.parse( await client.get( issueKey ) || '{}' );
 		const issueUser = issueUsers[ socket.session.login ];
 
 		if ( !issueUser || !issueUser.sockets.includes( socket.id ) ) {
@@ -103,7 +100,7 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueUsers );
 
-		await storeUsers( issueKey, JSON.stringify( issueUsers ) );
+		await client.set( issueKey, JSON.stringify( issueUsers ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
