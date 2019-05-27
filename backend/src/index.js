@@ -30,10 +30,7 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async( message, reply ) => {
 		const issueKey = `${ message.repoName }:${ message.issueId }`;
-
-		if ( !await fetchUsers( issueKey ) ) {
-			await storeUsers( issueKey, '{}' );
-		}
+		const issueUsers = JSON.parse( await fetchUsers( issueKey ) ) || {};
 
 		if ( !socket.session.issues ) {
 			socket.session.issues = [];
@@ -42,8 +39,6 @@ io.on( 'connection', socket => {
 		if ( !socket.session.issues.includes( issueKey ) ) {
 			socket.session.issues.push( issueKey );
 		}
-
-		const issueUsers = JSON.parse( await fetchUsers( issueKey ) );
 
 		if ( !issueUsers.hasOwnProperty( message.user.login ) ) {
 			issueUsers[ message.user.login ] = { sockets: [], tabs: {}, joinedAt: timestamp };
