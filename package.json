@@ -2,7 +2,6 @@
   "name": "hanghub",
   "version": "0.0.1",
   "private": true,
-  "description": "HangHub is a productivity tool that allows you to see users who are working on the same GitHub issue as you. It is available as a browser extension for Chrome and Firefox.",
   "author": "CKSource (http://cksource.com/)",
   "license": "MIT",
   "scripts": {

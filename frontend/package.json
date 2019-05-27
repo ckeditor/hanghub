@@ -2,7 +2,6 @@
   "name": "hanghub-frontend",
   "version": "0.0.1",
   "private": true,
-  "description": "",
   "author": "CKSource (http://cksource.com/)",
   "license": "MIT",
   "scripts": {
