@@ -83,11 +83,6 @@ io.on( 'connection', socket => {
 
 	async function removeUser( issueKey ) {
 		const issueUsers = JSON.parse( await fetchUsers( issueKey ) || '{}' );
-
-		if ( Object.keys( issueUsers ).length === 0 ) {
-			return;
-		}
-
 		const issueUser = issueUsers[ socket.session.login ];
 
 		if ( !issueUser || !issueUser.sockets.includes( socket.id ) ) {
