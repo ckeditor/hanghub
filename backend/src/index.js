@@ -21,16 +21,14 @@ const client = new Redis();
 const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
 
 io.on( 'connection', socket => {
-	socket.session = {};
-
 	const timestamp = new Date();
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
 		const issueUsers = getUsersFromDatabase( issueKey );
 
-		if ( !socket.session.issueKey ) {
-			socket.session.issueKey = issueKey;
+		if ( !socket.issueKey ) {
+			socket.issueKey = issueKey;
 		}
 
 		if ( !issueUsers.hasOwnProperty( message.user.login ) ) {
@@ -40,7 +38,7 @@ io.on( 'connection', socket => {
 		const issueUser = issueUsers[ message.user.login ];
 
 		if ( !issueUser.tabs.hasOwnProperty( socket.id ) ) {
-			socket.session.login = message.user.login;
+			socket.login = message.user.login;
 
 			socket.join( issueKey );
 		}
@@ -57,22 +55,20 @@ io.on( 'connection', socket => {
 		reply( null, users );
 	} );
 
-	socket.on( 'removeUser', async message => {
-		const issueKey = createIssueKey( message.repoName, message.issueId );
-
-		await removeUser( issueKey );
+	socket.on( 'removeUser', async () => {
+		await removeUser( socket.issueKey );
 	} );
 
 	socket.on( 'disconnect', async () => {
-		await removeUser( socket.session.issueKey );
+		await removeUser( socket.issueKey );
 	} );
 
 	async function removeUser( issueKey ) {
 		const issueUsers = getUsersFromDatabase( issueKey );
 
-		const issueUser = issueUsers[ socket.session.login ];
+		const issueUser = issueUsers[ socket.login ];
 
-		if ( !issueUser || issueUser.tabs.hasOwnProperty( socket.id ) ) {
+		if ( !issueUser || !issueUser.tabs.hasOwnProperty( socket.id ) ) {
 			return;
 		}
 
@@ -84,11 +80,11 @@ io.on( 'connection', socket => {
 			return;
 		}
 
-		delete issueUsers[ socket.session.login ];
+		delete issueUsers[ socket.login ];
 
 		const users = getUsers( issueUsers );
 
-		await client.hset( issueKey, socket.session.login, JSON.stringify( issueUser ) );
+		await client.hset( issueKey, socket.login, JSON.stringify( issueUser ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
