@@ -112,8 +112,6 @@ export default class HangHub {
 		}
 
 		if ( this._hasUserLeftPage( repoName, issueId ) ) {
-			this._socket.emit( 'removeUser', { repoName: this._repoName, issueId: this._issueId } );
-
 			this._repoName = null;
 			this._issueId = null;
 
