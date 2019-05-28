@@ -55,10 +55,6 @@ io.on( 'connection', socket => {
 		reply( null, users );
 	} );
 
-	socket.on( 'removeUser', async () => {
-		await removeUser( socket.issueKey );
-	} );
-
 	socket.on( 'disconnect', async () => {
 		await removeUser( socket.issueKey );
 	} );
