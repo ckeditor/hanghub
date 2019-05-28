@@ -25,30 +25,25 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
-		const issueUsers = getUsersFromDatabase( issueKey );
+		const issueSessions = await getSessionsFromDatabase( issueKey );
 
 		if ( !socket.issueKey ) {
 			socket.issueKey = issueKey;
 		}
 
-		if ( !issueUsers.hasOwnProperty( message.user.login ) ) {
-			issueUsers[ message.user.login ] = { tabs: {}, joinedAt: timestamp };
+		if ( !issueSessions.hasOwnProperty( issueKey ) ) {
+			issueSessions[ socket.id ] = Object.assign( message.user, { joinedAt: timestamp } );
 		}
 
-		const issueUser = issueUsers[ message.user.login ];
+		const issueSession = issueSessions[ socket.id ];
 
-		if ( !issueUser.tabs.hasOwnProperty( socket.id ) ) {
-			socket.login = message.user.login;
-
+		if ( !issueSessions.hasOwnProperty( socket.id ) ) {
 			socket.join( issueKey );
 		}
 
-		issueUser.tabs[ socket.id ] = message.user.state;
-		issueUser.user = message.user;
+		const users = getUsers( issueSessions );
 
-		const users = getUsers( issueUsers );
-
-		await client.hset( issueKey, message.user.login, JSON.stringify( issueUser ) );
+		await client.hset( issueKey, socket.id, JSON.stringify( issueSession ) );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -56,36 +51,22 @@ io.on( 'connection', socket => {
 	} );
 
 	socket.on( 'disconnect', async () => {
-		await removeUser( socket.issueKey );
+		const issueSessions = await getSessionsFromDatabase( socket.issueKey );
+
+		if ( !issueSessions[ socket.id ] ) {
+			return;
+		}
+
+		delete issueSessions[ socket.id ];
+
+		const users = getUsers( issueSessions );
+
+		client.hdel( socket.issueKey, socket.id );
+
+		socket.broadcast.to( socket.issueKey ).emit( 'refresh', users );
+
+		socket.leave( socket.issueKey );
 	} );
-
-	async function removeUser( issueKey ) {
-		const issueUsers = getUsersFromDatabase( issueKey );
-
-		const issueUser = issueUsers[ socket.login ];
-
-		if ( !issueUser || !issueUser.tabs.hasOwnProperty( socket.id ) ) {
-			return;
-		}
-
-		if ( issueUser.tabs.hasOwnProperty( socket.id ) ) {
-			delete issueUser.tabs[ socket.id ];
-		}
-
-		if ( Object.keys( issueUser.tabs ).length ) {
-			return;
-		}
-
-		delete issueUsers[ socket.login ];
-
-		const users = getUsers( issueUsers );
-
-		await client.hset( issueKey, socket.login, JSON.stringify( issueUser ) );
-
-		socket.broadcast.to( issueKey ).emit( 'refresh', users );
-
-		socket.leave( issueKey );
-	}
 } );
 
 http.listen( PORT, () => {
@@ -96,38 +77,44 @@ function sortByDate( prev, next ) {
 	return new Date( next.joinedAt ).getMilliseconds() - new Date( prev.joinedAt ).getMilliseconds();
 }
 
-function getUsers( issueUsers ) {
-	return Object.values( issueUsers )
-		.sort( sortByDate )
-		.map( issueUser => ( Object.assign( {},
-			issueUser.user,
-			{ state: chooseMostImportantState( Object.values( issueUser.tabs ) ) }
-		) ) );
-}
+function getUsers( issueSessions ) {
+	const users = [];
 
-function chooseMostImportantState( states ) {
-	let mostImportantStateIndex = 0;
-
-	for ( const state of states ) {
-		if ( statePriorities.indexOf( state ) > mostImportantStateIndex ) {
-			mostImportantStateIndex = statePriorities.indexOf( state );
+	for ( const socketId in issueSessions ) {
+		if ( !users.length || !users.find( user => user.id === issueSessions[ socketId ].id ) ) {
+			users.push( issueSessions[ socketId ] );
+			continue;
 		}
+		const userIndex = users.findIndex( user => user.id === issueSessions[ socketId ].id );
+		users[ userIndex ].state = chooseMostImportantState( users[ userIndex ].state, issueSessions[ socketId ].state );
 	}
 
-	return statePriorities[ mostImportantStateIndex ];
+	return users.sort( sortByDate );
+}
+
+function chooseMostImportantState( previousState, currentState ) {
+	console.log( previousState, currentState );
+	const previousStateIndex = statePriorities.indexOf( previousState );
+	const currentStateIndex = statePriorities.indexOf( currentState );
+
+	if ( previousStateIndex > currentStateIndex ) {
+		return statePriorities[ previousStateIndex ];
+	}
+
+	return statePriorities[ currentStateIndex ];
 }
 
 function createIssueKey( repoName, issueId ) {
 	return `${ repoName }:${ issueId }`;
 }
 
-async function getUsersFromDatabase( issueKey ) {
-	const issueUsers = {};
+async function getSessionsFromDatabase( issueKey ) {
+	const issueSessions = {};
 	const response = await client.hgetall( issueKey );
 
-	for ( const user in response ) {
-		issueUsers[ user ] = JSON.parse( response[ user ] );
+	for ( const session in response ) {
+		issueSessions[ session ] = JSON.parse( response[ session ] );
 	}
 
-	return issueUsers;
+	return issueSessions;
 }
