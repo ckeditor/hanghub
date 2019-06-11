@@ -28,21 +28,16 @@ io.on( 'connection', socket => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
 		const issueSessions = await repository.getAll( issueKey );
 
-		console.log( 'from browser: ', message.user );
-
 		if ( !socket.issueKey ) {
 			socket.issueKey = issueKey;
 		}
 
-		issueSessions[ socket.id ] = Object.assign( message.user, { joinedAt: timestamp } );
-
-		const issueSession = issueSessions[ socket.id ];
-		console.log( socket.id, 'is', issueSession );
-		console.log( 'All sessions: ', issueSessions );
-
 		if ( !issueSessions.hasOwnProperty( socket.id ) ) {
 			socket.join( issueKey );
 		}
+		console.log( 'before update: ', issueSessions );
+		issueSessions[ socket.id ] = Object.assign( message.user, { joinedAt: timestamp } );
+		console.log( 'updated: ', issueSessions );
 
 		const users = getUsers( issueSessions );
 
@@ -83,7 +78,7 @@ function sortByDate( prev, next ) {
 function getUsers( issueSessions ) {
 	const users = [];
 	for ( const socketId in issueSessions ) {
-		if ( !users.length || !users.find( user => user.id === issueSessions[ socketId ].id ) ) {
+		if ( !users.find( user => user.id === issueSessions[ socketId ].id ) ) {
 			users.push( issueSessions[ socketId ] );
 			continue;
 		}
@@ -97,7 +92,6 @@ function getUsers( issueSessions ) {
 }
 
 function chooseMostImportantState( previousState, currentState ) {
-	console.log( previousState, currentState );
 	const previousStateIndex = statePriorities.indexOf( previousState );
 	const currentStateIndex = statePriorities.indexOf( currentState );
 
