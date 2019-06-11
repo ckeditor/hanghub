@@ -11,11 +11,12 @@ const app = require( 'express' )();
 const { Server } = require( 'http' );
 const http = new Server( app );
 const io = require( 'socket.io' )( http );
-const Redis = require( 'ioredis' );
-const redisAdapter = require( 'socket.io-redis' );
-io.adapter( redisAdapter( { host: 'localhost', port: 6379 } ) );
 
-const client = new Redis();
+const RedisDriver = require( './RedisDriver' );
+const SessionRepository = require( './SessionRepository' );
+
+const driver = new RedisDriver( io, 'localhost', 6379 );
+const repository = new SessionRepository( driver );
 
 // Priorities are set from the lowest to the highest.
 const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
@@ -25,17 +26,19 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.issueId );
-		const issueSessions = await getSessionsFromDatabase( issueKey );
+		const issueSessions = await repository.getAll( issueKey );
+
+		console.log( 'from browser: ', message.user );
 
 		if ( !socket.issueKey ) {
 			socket.issueKey = issueKey;
 		}
 
-		if ( !issueSessions.hasOwnProperty( issueKey ) ) {
-			issueSessions[ socket.id ] = Object.assign( message.user, { joinedAt: timestamp } );
-		}
+		issueSessions[ socket.id ] = Object.assign( message.user, { joinedAt: timestamp } );
 
 		const issueSession = issueSessions[ socket.id ];
+		console.log( socket.id, 'is', issueSession );
+		console.log( 'All sessions: ', issueSessions );
 
 		if ( !issueSessions.hasOwnProperty( socket.id ) ) {
 			socket.join( issueKey );
@@ -43,7 +46,7 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueSessions );
 
-		await client.hset( issueKey, socket.id, JSON.stringify( issueSession ) );
+		await repository.createOrUpdate( issueKey, socket.id, message.user );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -51,7 +54,7 @@ io.on( 'connection', socket => {
 	} );
 
 	socket.on( 'disconnect', async () => {
-		const issueSessions = await getSessionsFromDatabase( socket.issueKey );
+		const issueSessions = await repository.getAll( socket.issueKey );
 
 		if ( !issueSessions[ socket.id ] ) {
 			return;
@@ -61,7 +64,7 @@ io.on( 'connection', socket => {
 
 		const users = getUsers( issueSessions );
 
-		client.hdel( socket.issueKey, socket.id );
+		await repository.deleteOne( socket );
 
 		socket.broadcast.to( socket.issueKey ).emit( 'refresh', users );
 
@@ -79,13 +82,14 @@ function sortByDate( prev, next ) {
 
 function getUsers( issueSessions ) {
 	const users = [];
-
 	for ( const socketId in issueSessions ) {
 		if ( !users.length || !users.find( user => user.id === issueSessions[ socketId ].id ) ) {
 			users.push( issueSessions[ socketId ] );
 			continue;
 		}
+
 		const userIndex = users.findIndex( user => user.id === issueSessions[ socketId ].id );
+
 		users[ userIndex ].state = chooseMostImportantState( users[ userIndex ].state, issueSessions[ socketId ].state );
 	}
 
@@ -106,15 +110,4 @@ function chooseMostImportantState( previousState, currentState ) {
 
 function createIssueKey( repoName, issueId ) {
 	return `${ repoName }:${ issueId }`;
-}
-
-async function getSessionsFromDatabase( issueKey ) {
-	const issueSessions = {};
-	const response = await client.hgetall( issueKey );
-
-	for ( const session in response ) {
-		issueSessions[ session ] = JSON.parse( response[ session ] );
-	}
-
-	return issueSessions;
 }
