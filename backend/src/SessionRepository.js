@@ -15,11 +15,11 @@ class SessionRepository {
 	}
 
 	async createOrUpdate( issueKey, socketId, issueSession ) {
-		this._driver.client.hset( issueKey, socketId, JSON.stringify( issueSession ) );
+		await this._driver.client.hset( issueKey, socketId, JSON.stringify( issueSession ) );
 	}
 
 	async deleteOne( socket ) {
-		this._driver.client.hdel( socket.issueKey, socket.id );
+		await this._driver.client.hdel( socket.issueKey, socket.id );
 	}
 }
 
