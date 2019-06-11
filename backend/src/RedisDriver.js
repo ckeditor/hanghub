@@ -16,6 +16,8 @@ class RedisDriver {
 	_connect( io, host, port ) {
 		const client = new Redis();
 		io.adapter( redisAdapter( { host, port } ) );
+		client.flushall();
+
 		return client;
 	}
 }
