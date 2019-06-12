@@ -5,21 +5,19 @@
 
 'use strict';
 
-const PORT = process.env.PORT || 3000;
-
 const app = require( 'express' )();
 const { Server } = require( 'http' );
 const http = new Server( app );
 const io = require( 'socket.io' )( http );
+const dotenv = require( 'dotenv' );
+dotenv.config( { path: '.env' } );
 
 const RedisDriver = require( './RedisDriver' );
 const SessionRepository = require( './SessionRepository' );
+const { UserHelper } = require( './helpers/UserHelper' );
 
-const driver = new RedisDriver( io, 'localhost', 6379 );
+const driver = new RedisDriver( io, process.env.HOST, process.env.REDIS_ADAPTER_PORT );
 const repository = new SessionRepository( driver );
-
-// Priorities are set from the lowest to the highest.
-const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
 
 io.on( 'connection', socket => {
 	const timestamp = new Date();
@@ -35,13 +33,13 @@ io.on( 'connection', socket => {
 		if ( !issueSessions.hasOwnProperty( socket.id ) ) {
 			socket.join( issueKey );
 		}
-		console.log( 'before update: ', issueSessions );
-		issueSessions[ socket.id ] = Object.assign( message.user, { joinedAt: timestamp } );
-		console.log( 'updated: ', issueSessions );
 
-		const users = getUsers( issueSessions );
+		const issueSession = { ...message.user, joinedAt: timestamp };
+		issueSessions[ socket.id ] = issueSession;
 
-		await repository.createOrUpdate( issueKey, socket.id, message.user );
+		const users = UserHelper.getUserListFromSessions( issueSessions );
+
+		await repository.createOrUpdate( issueKey, socket.id, issueSession );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
@@ -57,7 +55,7 @@ io.on( 'connection', socket => {
 
 		delete issueSessions[ socket.id ];
 
-		const users = getUsers( issueSessions );
+		const users = UserHelper.getUserListFromSessions( issueSessions );
 
 		await repository.deleteOne( socket );
 
@@ -67,40 +65,9 @@ io.on( 'connection', socket => {
 	} );
 } );
 
-http.listen( PORT, () => {
-	console.log( 'listening on *:' + PORT );
+http.listen( process.env.DEFAULT_PORT, () => {
+	console.log( 'listening on *:' + process.env.DEFAULT_PORT );
 } );
-
-function sortByDate( prev, next ) {
-	return new Date( next.joinedAt ).getMilliseconds() - new Date( prev.joinedAt ).getMilliseconds();
-}
-
-function getUsers( issueSessions ) {
-	const users = [];
-	for ( const socketId in issueSessions ) {
-		if ( !users.find( user => user.id === issueSessions[ socketId ].id ) ) {
-			users.push( issueSessions[ socketId ] );
-			continue;
-		}
-
-		const userIndex = users.findIndex( user => user.id === issueSessions[ socketId ].id );
-
-		users[ userIndex ].state = chooseMostImportantState( users[ userIndex ].state, issueSessions[ socketId ].state );
-	}
-
-	return users.sort( sortByDate );
-}
-
-function chooseMostImportantState( previousState, currentState ) {
-	const previousStateIndex = statePriorities.indexOf( previousState );
-	const currentStateIndex = statePriorities.indexOf( currentState );
-
-	if ( previousStateIndex > currentStateIndex ) {
-		return statePriorities[ previousStateIndex ];
-	}
-
-	return statePriorities[ currentStateIndex ];
-}
 
 function createIssueKey( repoName, pageType, issueId ) {
 	return `${ repoName }:${ pageType }/${ issueId }`;
