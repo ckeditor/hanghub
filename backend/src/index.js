@@ -25,7 +25,7 @@ io.on( 'connection', socket => {
 	const timestamp = new Date();
 
 	socket.on( 'setUser', async ( message, reply ) => {
-		const issueKey = createIssueKey( message.repoName, message.issueId );
+		const issueKey = createIssueKey( message.repoName, message.pageType, message.issueId );
 		const issueSessions = await repository.getAll( issueKey );
 
 		if ( !socket.issueKey ) {
@@ -102,6 +102,6 @@ function chooseMostImportantState( previousState, currentState ) {
 	return statePriorities[ currentStateIndex ];
 }
 
-function createIssueKey( repoName, issueId ) {
-	return `${ repoName }:${ issueId }`;
+function createIssueKey( repoName, pageType, issueId ) {
+	return `${ repoName }:${ pageType }/${ issueId }`;
 }
