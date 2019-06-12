@@ -5,13 +5,13 @@ class UserHelper {
 	static getUserListFromSessions( issueSessions ) {
 		const users = [];
 		for ( const socketId in issueSessions ) {
-			const userIndex = users.findIndex( user => user.id === issueSessions[ socketId ].id );
-			if ( !userIndex ) {
+			const user = users.find( user => user.id === issueSessions[ socketId ].id );
+			if ( !user ) {
 				users.push( issueSessions[ socketId ] );
 				continue;
 			}
 
-			users[ userIndex ].state = this._chooseMoreImportantUserState( users[ userIndex ].state, issueSessions[ socketId ].state );
+			user.state = this._chooseMoreImportantUserState( user.state, issueSessions[ socketId ].state );
 		}
 
 		return users.sort( this._sortUsersByDate );
