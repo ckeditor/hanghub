@@ -4,7 +4,8 @@
   "private": true,
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "mocha tests/*.test.js"
   },
   "author": "CKSource (http://cksource.com/)",
   "license": "MIT",
@@ -13,5 +14,10 @@
     "ioredis": "^4.9.5",
     "socket.io": "^2.2.0",
     "socket.io-redis": "^5.2.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "dotenv": "^8.0.0",
+    "mocha": "^6.1.4"
   }
 }
