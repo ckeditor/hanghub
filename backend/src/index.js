@@ -24,22 +24,21 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.pageType, message.issueId );
-		const issueSessions = await repository.getAll( issueKey );
+
+		const issueSession = { ...message.user, joinedAt: timestamp };
+		await repository.createOrUpdate( issueKey, socket.id, issueSession );
 
 		if ( !socket.issueKey ) {
 			socket.issueKey = issueKey;
 		}
 
+		const issueSessions = await repository.getAll( issueKey );
+
 		if ( !issueSessions.hasOwnProperty( socket.id ) ) {
 			socket.join( issueKey );
 		}
 
-		const issueSession = { ...message.user, joinedAt: timestamp };
-		issueSessions[ socket.id ] = issueSession;
-
 		const users = UserHelper.getUserListFromSessions( issueSessions );
-
-		await repository.createOrUpdate( issueKey, socket.id, issueSession );
 
 		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 
