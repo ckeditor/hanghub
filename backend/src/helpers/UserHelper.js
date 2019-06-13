@@ -3,18 +3,24 @@ const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' 
 
 class UserHelper {
 	static getUserListFromSessions( issueSessions ) {
-		const users = [];
+		const users = {};
 		for ( const socketId in issueSessions ) {
-			const user = users.find( user => user.id === issueSessions[ socketId ].id );
-			if ( !user ) {
-				users.push( issueSessions[ socketId ] );
+			if ( !users[ issueSessions[ socketId ].id ] ) {
+				users[ issueSessions[ socketId ].id ] = [ issueSessions[ socketId ] ];
 				continue;
 			}
-
-			user.state = this._chooseMoreImportantUserState( user.state, issueSessions[ socketId ].state );
+			users[ issueSessions[ socketId ].id ].push( issueSessions[ socketId ] );
 		}
 
-		return users.sort( this._sortUsersByDate );
+		return Object.values( users )
+			.map( userSessions => {
+				return {
+					...userSessions[ 0 ],
+					state: userSessions.map( session => session.state ).reduce( ( mostImportantState, nextState ) =>
+						this._chooseMoreImportantUserState( mostImportantState, nextState ), statePriorities[ 0 ] )
+				};
+			} )
+			.sort( this._sortUsersByDate );
 	}
 
 	static _chooseMoreImportantUserState( previousState, currentState ) {
