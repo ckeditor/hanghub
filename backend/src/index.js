@@ -24,8 +24,8 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.pageType, message.issueId );
-
 		const issueSession = { ...message.user, joinedAt: timestamp };
+
 		await repository.createOrUpdate( issueKey, socket.id, issueSession );
 
 		if ( !socket.issueKey ) {
@@ -40,12 +40,14 @@ io.on( 'connection', socket => {
 
 		const users = UserHelper.getUserListFromSessions( issueSessions );
 
-		socket.broadcast.to( issueKey ).emit( 'refresh', users );
+		io.in( issueKey ).emit( 'refresh', users );
 
 		reply( null, users );
 	} );
 
 	socket.on( 'disconnect', async () => {
+		await repository.deleteOne( socket );
+
 		const issueSessions = await repository.getAll( socket.issueKey );
 
 		if ( !issueSessions[ socket.id ] ) {
@@ -56,9 +58,7 @@ io.on( 'connection', socket => {
 
 		const users = UserHelper.getUserListFromSessions( issueSessions );
 
-		await repository.deleteOne( socket );
-
-		socket.broadcast.to( socket.issueKey ).emit( 'refresh', users );
+		io.in( socket.issueKey ).emit( 'refresh', users );
 
 		socket.leave( socket.issueKey );
 	} );
