@@ -28,7 +28,7 @@ function Collaborator( { user } ) {
 			<p>
 				<span className="js-hovercard-left" data-hovercard-type="user" data-hovercard-url={ user.id ? `/hovercards?user_id=${ user.id }` : null } data-assignee-name={ user.login }>
 					<a className="no-underline" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href={ '/' + user.login } aria-describedby="hovercard-aria-description">
-						<img className="avatar" src={ user.avatar } width="20" height="20" alt={ user.login } />
+						<img className="avatar" src={ `https://avatars2.githubusercontent.com/u/${ user.id }` } width="20" height="20" alt={ user.login } />
 					</a>
 					<a className="assignee link-gray-dark" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self" href={ '/' + user.login } aria-describedby="hovercard-aria-description">
 						<span className="css-truncate-target">&nbsp;{ user.login }&nbsp;</span>

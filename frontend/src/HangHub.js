@@ -38,7 +38,6 @@ export default class HangHub {
 
 		this._user = {
 			login: userLogin,
-			avatar: `https://avatars2.githubusercontent.com/u/${ userId }`,
 			id: userId || null,
 			state: this._getState()
 		};
