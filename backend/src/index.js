@@ -40,7 +40,7 @@ io.on( 'connection', socket => {
 
 		const users = UserHelper.getUserListFromSessions( issueSessions );
 
-		io.in( issueKey ).emit( 'refresh', users );
+		socket.to( issueKey ).emit( 'refresh', users );
 
 		reply( null, users );
 	} );
@@ -58,7 +58,7 @@ io.on( 'connection', socket => {
 
 		const users = UserHelper.getUserListFromSessions( issueSessions );
 
-		io.in( socket.issueKey ).emit( 'refresh', users );
+		socket.to( socket.issueKey ).emit( 'refresh', users );
 
 		socket.leave( socket.issueKey );
 	} );
