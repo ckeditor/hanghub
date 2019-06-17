@@ -24,6 +24,7 @@ io.on( 'connection', socket => {
 
 	socket.on( 'setUser', async ( message, reply ) => {
 		const issueKey = createIssueKey( message.repoName, message.pageType, message.issueId );
+
 		const issueSession = { ...message.user, joinedAt: timestamp };
 
 		await repository.createOrUpdate( issueKey, socket.id, issueSession );
@@ -34,15 +35,13 @@ io.on( 'connection', socket => {
 
 		const issueSessions = await repository.getAll( issueKey );
 
-		if ( !issueSessions.hasOwnProperty( socket.id ) ) {
-			socket.join( issueKey );
-		}
+		socket.join( issueKey );
 
 		const users = UserHelper.getUserListFromSessions( issueSessions );
 
-		socket.to( issueKey ).emit( 'refresh', users );
-
 		reply( null, users );
+
+		socket.broadcast.to( issueKey ).emit( 'refresh', users );
 	} );
 
 	socket.on( 'disconnect', async () => {
@@ -58,7 +57,7 @@ io.on( 'connection', socket => {
 
 		const users = UserHelper.getUserListFromSessions( issueSessions );
 
-		socket.to( socket.issueKey ).emit( 'refresh', users );
+		socket.broadcast.to( socket.issueKey ).emit( 'refresh', users );
 
 		socket.leave( socket.issueKey );
 	} );
