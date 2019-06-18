@@ -45,7 +45,7 @@ io.on( 'connection', socket => {
 	} );
 
 	socket.on( 'disconnect', async () => {
-		await repository.deleteOne( socket );
+		await repository.deleteOne( socket.id );
 
 		const issueSessions = await repository.getAll( socket.issueKey );
 
