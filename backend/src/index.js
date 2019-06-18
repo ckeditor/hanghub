@@ -16,7 +16,7 @@ const RedisDriver = require( './RedisDriver' );
 const SessionRepository = require( './SessionRepository' );
 const { UserHelper } = require( './helpers/UserHelper' );
 
-const driver = new RedisDriver( io, process.env.HOST, process.env.REDIS_ADAPTER_PORT );
+const driver = new RedisDriver( io );
 const repository = new SessionRepository( driver );
 
 io.on( 'connection', socket => {
