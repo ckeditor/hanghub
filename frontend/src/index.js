@@ -43,7 +43,7 @@ function canStart( config, hostname ) {
 		return false;
 	}
 
-	// Check if user opened 404 page
+	// Check if user opened page without required permissions.
 	if ( !document.getElementById( 'partial-discussion-header' ) ) {
 		return false;
 	}
