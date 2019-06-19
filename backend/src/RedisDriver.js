@@ -7,8 +7,8 @@ class RedisDriver {
 	constructor( io ) {
 		this.io = io;
 		this._config = {
-			host: process.env.HOST,
-			port: process.env.REDIS_ADAPTER_PORT
+			host: process.env.REDIS_HOST,
+			port: process.env.REDIS_PORT
 		};
 		this._client = this._connect( io );
 	}

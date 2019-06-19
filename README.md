@@ -72,11 +72,11 @@ npm i
 
 #### 2. Create and fill `.env` file
 
-The backend configuration is getting from `.env` file based on `.env.example`. You need to set:
+The backend configuration is loaded from `.env` file based on `.env.example`. You need to set:
 
 * DEFAULT_PORT
-* HOST
-* REDIS_ADAPTER_PORT
+* REDIS_HOST
+* REDIS_PORT
 
 #### 3. Deploy
 
