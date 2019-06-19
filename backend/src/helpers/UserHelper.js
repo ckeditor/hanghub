@@ -5,11 +5,12 @@ class UserHelper {
 	static getUserListFromSessions( issueSessions ) {
 		const users = {};
 		for ( const socketId in issueSessions ) {
-			if ( !users[ issueSessions[ socketId ].id ] ) {
-				users[ issueSessions[ socketId ].id ] = [ issueSessions[ socketId ] ];
-				continue;
+			const issueSession = issueSessions[ socketId ];
+
+			if ( !users[ issueSession.id ] ) {
+				users[ issueSession.id ] = [];
 			}
-			users[ issueSessions[ socketId ].id ].push( issueSessions[ socketId ] );
+			users[ issueSession.id ].push( issueSession );
 		}
 
 		return Object.values( users )
