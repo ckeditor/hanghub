@@ -17,8 +17,6 @@ services:
     restart: always
   hanghub1:
     image: hanghub:latest
-    ports:
-      - "3000:3000"
   hanghub2:
     image: hanghub:latest
   hanghub3:
