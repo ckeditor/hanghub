@@ -43,6 +43,11 @@ function canStart( config, hostname ) {
 		return false;
 	}
 
+	// Check if user opened 404 page
+	if ( !document.getElementById( 'partial-discussion-header' ) ) {
+		return false;
+	}
+
 	if ( isPluginEnabled ) {
 		return !isDisabledOrganization && !isDisabledRepository;
 	} else {
