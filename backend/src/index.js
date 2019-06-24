@@ -14,7 +14,7 @@ dotenv.config( { path: '.env' } );
 
 const RedisDriver = require( './RedisDriver' );
 const SessionRepository = require( './SessionRepository' );
-const { UserHelper } = require( './helpers/UserHelper' );
+const { getUserListFromSessions } = require( './helpers/UserHelper' );
 
 const driver = new RedisDriver( io );
 const repository = new SessionRepository( driver );
@@ -27,17 +27,16 @@ io.on( 'connection', socket => {
 
 		const issueSession = { ...message.user, joinedAt: timestamp };
 
-		await repository.set( issueKey, socket.id, issueSession );
+		await repository.set( issueKey, socket, issueSession );
 
 		if ( !socket.issueKey ) {
 			socket.issueKey = issueKey;
 		}
 
 		const issueSessions = await repository.getAll( issueKey );
-
 		socket.join( issueKey );
 
-		const users = UserHelper.getUserListFromSessions( issueSessions );
+		const users = getUserListFromSessions( issueSessions );
 
 		reply( null, users );
 
@@ -45,13 +44,12 @@ io.on( 'connection', socket => {
 	} );
 
 	socket.on( 'disconnect', async () => {
-		await repository.deleteOne( socket.id );
-
+		await repository.deleteOne( socket );
 		const issueSessions = await repository.getAll( socket.issueKey );
 
 		delete issueSessions[ socket.id ];
 
-		const users = UserHelper.getUserListFromSessions( issueSessions );
+		const users = getUserListFromSessions( issueSessions );
 
 		socket.broadcast.to( socket.issueKey ).emit( 'refresh', users );
 

@@ -20,7 +20,7 @@ function getUserListFromSessions( issueSessions ) {
 					chooseMoreImportantUserState( mostImportantState, nextState ), statePriorities[ 0 ] )
 			};
 		} )
-		.sort( sortUsersByDate() );
+		.sort( sortUsersByDate );
 }
 
 function chooseMoreImportantUserState( previousState, currentState ) {
@@ -35,6 +35,11 @@ function chooseMoreImportantUserState( previousState, currentState ) {
 }
 
 function sortUsersByDate( prev, next ) {
+	// Handle the case when there is only a one user.
+	if ( !prev || !next ) {
+		return;
+	}
+
 	return new Date( next.joinedAt ).getMilliseconds() - new Date( prev.joinedAt ).getMilliseconds();
 }
 

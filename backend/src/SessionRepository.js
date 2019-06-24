@@ -14,8 +14,8 @@ class SessionRepository {
 		return issueSessions;
 	}
 
-	async set( issueKey, socketId, issueSession ) {
-		await this._driver.client.hset( issueKey, socketId, JSON.stringify( issueSession ) );
+	async set( issueKey, socket, issueSession ) {
+		await this._driver.client.hset( issueKey, socket.id, JSON.stringify( issueSession ) );
 	}
 
 	async deleteOne( socket ) {
