@@ -2,7 +2,7 @@ const { expect } = require( 'chai' );
 const { getUserListFromSessions } = require( '../../src/helpers/helpers' );
 
 describe( 'getUsers', function() {
-	it( 'should return a sorted ascending list of connected users', function() {
+	it( 'should return a sorted ascending list of connected users', () => {
 		const sessionsData = {
 			IbVmSiD_LoULFK2yAAAB: {
 				id: '123',
@@ -45,7 +45,7 @@ describe( 'getUsers', function() {
 		] );
 	} );
 
-	it( 'should return a single connected user when only one user is provided', function() {
+	it( 'should return a single connected user when only one user is provided', () => {
 		const singleSessionData = {
 			IbVmSiD_LoULFK2yAAAB: {
 				id: '123',
@@ -61,7 +61,7 @@ describe( 'getUsers', function() {
 		] );
 	} );
 
-	it( 'should return an empty list of connected users when there are no users provided', function() {
+	it( 'should return an empty list of connected users when there are no users provided', () => {
 		expect( getUserListFromSessions( {} ) ).to.deep.equal( [] );
 	} );
 } );
