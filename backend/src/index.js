@@ -27,7 +27,7 @@ io.on( 'connection', socket => {
 
 		const issueSession = { ...message.user, joinedAt: timestamp };
 
-		await repository.createOrUpdate( issueKey, socket.id, issueSession );
+		await repository.set( issueKey, socket.id, issueSession );
 
 		if ( !socket.issueKey ) {
 			socket.issueKey = issueKey;

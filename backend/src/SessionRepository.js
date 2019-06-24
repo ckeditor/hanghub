@@ -14,7 +14,7 @@ class SessionRepository {
 		return issueSessions;
 	}
 
-	async createOrUpdate( issueKey, socketId, issueSession ) {
+	async set( issueKey, socketId, issueSession ) {
 		await this._driver.client.hset( issueKey, socketId, JSON.stringify( issueSession ) );
 	}
 
