@@ -1,6 +1,8 @@
 // Priorities are set from the lowest to the highest.
 const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
 
+module.exports = { getUserListFromSessions };
+
 function getUserListFromSessions( issueSessions ) {
 	const users = {};
 	for ( const socketId in issueSessions ) {
@@ -35,12 +37,5 @@ function chooseMoreImportantUserState( previousState, currentState ) {
 }
 
 function sortUsersByDate( prev, next ) {
-	// Handle the case when there is only a one user.
-	if ( !prev || !next ) {
-		return;
-	}
-
 	return new Date( next.joinedAt ).getMilliseconds() - new Date( prev.joinedAt ).getMilliseconds();
 }
-
-module.exports = { getUserListFromSessions };

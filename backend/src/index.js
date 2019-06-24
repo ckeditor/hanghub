@@ -14,7 +14,7 @@ dotenv.config( { path: '.env' } );
 
 const RedisDriver = require( './RedisDriver' );
 const SessionRepository = require( './SessionRepository' );
-const { getUserListFromSessions } = require( './helpers/UserHelper' );
+const { getUserListFromSessions } = require( './helpers/helpers' );
 
 const driver = new RedisDriver( io );
 const repository = new SessionRepository( driver );
