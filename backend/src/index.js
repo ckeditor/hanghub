@@ -49,10 +49,6 @@ io.on( 'connection', socket => {
 
 		const issueSessions = await repository.getAll( socket.issueKey );
 
-		if ( !issueSessions[ socket.id ] ) {
-			return;
-		}
-
 		delete issueSessions[ socket.id ];
 
 		const users = UserHelper.getUserListFromSessions( issueSessions );

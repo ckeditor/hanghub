@@ -1,5 +1,5 @@
 const { expect } = require( 'chai' );
-const { UserHelper } = require( '../../src/helpers/UserHelper' );
+const { getUserListFromSessions } = require( '../../src/helpers/UserHelper' );
 
 const sessionsData = {
 	IbVmSiD_LoULFK2yAAAB: {
@@ -26,7 +26,7 @@ const sessionsData = {
 
 describe( 'getUsers', function() {
 	it( 'Should return list of users', function() {
-		expect( UserHelper.getUserListFromSessions( sessionsData ) ).to.deep.equal( [
+		expect( getUserListFromSessions( sessionsData ) ).to.deep.equal( [
 			{
 				id: '123',
 				state: 'editing',
