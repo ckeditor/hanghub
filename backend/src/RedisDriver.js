@@ -20,7 +20,6 @@ class RedisDriver {
 	_connect( io ) {
 		const client = new Redis( this._config );
 		io.adapter( redisAdapter( this._config ) );
-		client.flushall();
 
 		return client;
 	}
