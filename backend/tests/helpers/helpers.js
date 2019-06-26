@@ -1,7 +1,7 @@
 const { expect } = require( 'chai' );
 const { getUserListFromSessions } = require( '../../src/helpers/helpers' );
 
-describe( 'getUsers', function() {
+describe( 'getUsers', () => {
 	it( 'should return a sorted ascending list of connected users', () => {
 		const sessionsData = {
 			IbVmSiD_LoULFK2yAAAB: {
