@@ -16,8 +16,10 @@ const RedisDriver = require( './RedisDriver' );
 const SessionRepository = require( './SessionRepository' );
 const { getUserListFromSessions } = require( './helpers/helpers' );
 
-const driver = new RedisDriver( io, process.env.REDIS_HOST, process.env.REDIS_PORT );
-const repository = new SessionRepository( driver );
+const redisDriver = new RedisDriver( io, process.env.REDIS_HOST, process.env.REDIS_PORT );
+redisDriver.connect();
+
+const repository = new SessionRepository( redisDriver );
 
 io.on( 'connection', socket => {
 	const timestamp = new Date();

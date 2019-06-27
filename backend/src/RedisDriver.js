@@ -8,19 +8,19 @@ module.exports = class RedisDriver {
 			host,
 			port
 		};
-		this._client = this._connect();
+		this._client = null;
 	}
 
 	get client() {
 		return this._client;
 	}
 
-	_connect() {
+	connect() {
 		const client = new Redis( this._config );
 
 		this.io.adapter( redisAdapter( this._config ) );
 
-		return client;
+		this._client = client;
 	}
 };
 
