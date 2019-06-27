@@ -1,5 +1,5 @@
 // Priorities are set from the lowest to the highest.
-const statePriorities = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
+const STATE_PRIORITES = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
 
 module.exports = { getUserListFromSessions };
 
@@ -19,21 +19,21 @@ function getUserListFromSessions( issueSessions ) {
 			return {
 				...userSessions[ 0 ],
 				state: userSessions.map( session => session.state ).reduce( ( mostImportantState, nextState ) =>
-					chooseMoreImportantUserState( mostImportantState, nextState ), statePriorities[ 0 ] )
+					chooseMoreImportantUserState( mostImportantState, nextState ), STATE_PRIORITES[ 0 ] )
 			};
 		} )
 		.sort( sortUsersByDate );
 }
 
 function chooseMoreImportantUserState( previousState, currentState ) {
-	const previousStateIndex = statePriorities.indexOf( previousState );
-	const currentStateIndex = statePriorities.indexOf( currentState );
+	const previousStateIndex = STATE_PRIORITES.indexOf( previousState );
+	const currentStateIndex = STATE_PRIORITES.indexOf( currentState );
 
 	if ( previousStateIndex > currentStateIndex ) {
-		return statePriorities[ previousStateIndex ];
+		return STATE_PRIORITES[ previousStateIndex ];
 	}
 
-	return statePriorities[ currentStateIndex ];
+	return STATE_PRIORITES[ currentStateIndex ];
 }
 
 function sortUsersByDate( prev, next ) {
