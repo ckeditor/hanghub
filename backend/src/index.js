@@ -49,8 +49,6 @@ io.on( 'connection', socket => {
 
 		const issueSessions = await repository.getAll( socket.issueKey );
 
-		delete issueSessions[ socket.id ];
-
 		const users = getUserListFromSessions( issueSessions );
 
 		socket.broadcast.to( socket.issueKey ).emit( 'refresh', users );
