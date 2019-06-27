@@ -14,7 +14,7 @@ module.exports = class SessionRepository {
 		return issueSessions;
 	}
 
-	async set( issueKey, socketId, issueSession ) {
+	async setOne( issueKey, socketId, issueSession ) {
 		await this._driver.client.hset( issueKey, socketId, JSON.stringify( issueSession ) );
 	}
 
