@@ -24,7 +24,7 @@ const repository = new SessionRepository( redisDriver );
 io.on( 'connection', socket => {
 	const timestamp = new Date();
 
-	socket.on( 'setUser', async ( message, reply ) => {
+	socket.on( 'setUser', async message => {
 		const issueKey = createIssueKey( message.repoName, message.pageType, message.issueId );
 
 		const issueSession = { ...message.user, joinedAt: timestamp };
@@ -35,25 +35,15 @@ io.on( 'connection', socket => {
 			socket.issueKey = issueKey;
 		}
 
-		const issueSessions = await repository.getAll( issueKey );
-
 		socket.join( issueKey );
 
-		const users = getUserListFromSessions( issueSessions );
-
-		reply( null, users );
-
-		socket.broadcast.to( issueKey ).emit( 'refresh', users );
+		await broadcastUsers( issueKey );
 	} );
 
 	socket.on( 'disconnect', async () => {
 		await repository.deleteOne( socket.issueKey, socket.id );
 
-		const issueSessions = await repository.getAll( socket.issueKey );
-
-		const users = getUserListFromSessions( issueSessions );
-
-		socket.broadcast.to( socket.issueKey ).emit( 'refresh', users );
+		await broadcastUsers( socket.issueKey );
 
 		socket.leave( socket.issueKey );
 	} );
@@ -65,4 +55,12 @@ http.listen( process.env.DEFAULT_PORT, () => {
 
 function createIssueKey( repoName, pageType, issueId ) {
 	return `${ repoName }:${ pageType }/${ issueId }`;
+}
+
+async function broadcastUsers( issueKey ) {
+	const issueSessions = await repository.getAll( issueKey );
+
+	const users = getUserListFromSessions( issueSessions );
+
+	io.in( issueKey ).emit( 'refresh', users );
 }
