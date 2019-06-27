@@ -8,16 +8,16 @@ module.exports = class RedisDriver {
 			host,
 			port
 		};
-		this._client = this._connect( io );
+		this._client = this._connect();
 	}
 
 	get client() {
 		return this._client;
 	}
 
-	_connect( io ) {
+	_connect() {
 		const client = new Redis( this._config );
-		io.adapter( redisAdapter( this._config ) );
+		this.io.adapter( redisAdapter( this._config ) );
 
 		return client;
 	}
