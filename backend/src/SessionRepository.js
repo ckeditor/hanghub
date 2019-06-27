@@ -14,11 +14,11 @@ module.exports = class SessionRepository {
 		return issueSessions;
 	}
 
-	async set( issueKey, socket, issueSession ) {
-		await this._driver.client.hset( issueKey, socket.id, JSON.stringify( issueSession ) );
+	async set( issueKey, socketId, issueSession ) {
+		await this._driver.client.hset( issueKey, socketId, JSON.stringify( issueSession ) );
 	}
 
-	async deleteOne( socket ) {
-		await this._driver.client.hdel( socket.issueKey, socket.id );
+	async deleteOne( issueKey, socketId ) {
+		await this._driver.client.hdel( issueKey, socketId );
 	}
 };

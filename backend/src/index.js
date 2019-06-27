@@ -29,7 +29,7 @@ io.on( 'connection', socket => {
 
 		const issueSession = { ...message.user, joinedAt: timestamp };
 
-		await repository.set( issueKey, socket, issueSession );
+		await repository.set( issueKey, socket.id, issueSession );
 
 		if ( !socket.issueKey ) {
 			socket.issueKey = issueKey;
@@ -47,7 +47,7 @@ io.on( 'connection', socket => {
 	} );
 
 	socket.on( 'disconnect', async () => {
-		await repository.deleteOne( socket );
+		await repository.deleteOne( socket.issueKey, socket.id );
 
 		const issueSessions = await repository.getAll( socket.issueKey );
 
