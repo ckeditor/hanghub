@@ -1,7 +1,7 @@
 const Redis = require( 'ioredis' );
 const redisAdapter = require( 'socket.io-redis' );
 
-class RedisDriver {
+module.exports = class RedisDriver {
 	constructor( io, host, port ) {
 		this.io = io;
 		this._config = {
@@ -21,6 +21,5 @@ class RedisDriver {
 
 		return client;
 	}
-}
+};
 
-module.exports = RedisDriver;

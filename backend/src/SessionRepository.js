@@ -1,4 +1,4 @@
-class SessionRepository {
+module.exports = class SessionRepository {
 	constructor( driver ) {
 		this._driver = driver;
 	}
@@ -21,6 +21,4 @@ class SessionRepository {
 	async deleteOne( socket ) {
 		await this._driver.client.hdel( socket.issueKey, socket.id );
 	}
-}
-
-module.exports = SessionRepository;
+};
