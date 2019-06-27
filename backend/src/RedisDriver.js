@@ -1,14 +1,12 @@
 const Redis = require( 'ioredis' );
 const redisAdapter = require( 'socket.io-redis' );
-const dotenv = require( 'dotenv' );
-dotenv.config( { path: '.env' } );
 
 class RedisDriver {
-	constructor( io ) {
+	constructor( io, host, port ) {
 		this.io = io;
 		this._config = {
-			host: process.env.REDIS_HOST,
-			port: process.env.REDIS_PORT
+			host,
+			port
 		};
 		this._client = this._connect( io );
 	}
