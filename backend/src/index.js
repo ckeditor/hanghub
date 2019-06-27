@@ -34,6 +34,7 @@ io.on( 'connection', socket => {
 		}
 
 		const issueSessions = await repository.getAll( issueKey );
+
 		socket.join( issueKey );
 
 		const users = getUserListFromSessions( issueSessions );
@@ -45,6 +46,7 @@ io.on( 'connection', socket => {
 
 	socket.on( 'disconnect', async () => {
 		await repository.deleteOne( socket );
+
 		const issueSessions = await repository.getAll( socket.issueKey );
 
 		delete issueSessions[ socket.id ];

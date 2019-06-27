@@ -17,6 +17,7 @@ module.exports = class RedisDriver {
 
 	_connect() {
 		const client = new Redis( this._config );
+
 		this.io.adapter( redisAdapter( this._config ) );
 
 		return client;

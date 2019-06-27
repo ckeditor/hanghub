@@ -5,12 +5,14 @@ module.exports = { getUserListFromSessions };
 
 function getUserListFromSessions( issueSessions ) {
 	const users = {};
+
 	for ( const socketId in issueSessions ) {
 		const issueSession = issueSessions[ socketId ];
 
 		if ( !users[ issueSession.id ] ) {
 			users[ issueSession.id ] = [];
 		}
+
 		users[ issueSession.id ].push( issueSession );
 	}
 
