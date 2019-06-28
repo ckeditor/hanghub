@@ -2,6 +2,22 @@ module.exports = class SessionBaseRepository {
 	constructor() {
 		// Priorities are set from the lowest to the highest.
 		this._STATE_PRIORITES = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
+
+		if ( this.constructor === SessionBaseRepository ) {
+			throw new Error( 'Abstract class "SessionBaseRepository" cannot be instantiated directly.' );
+		}
+	}
+
+	getAll() {
+		throw new Error( 'Must be implemented in a child class.' );
+	}
+
+	set() {
+		throw new Error( 'Must be implemented in a child class.' );
+	}
+
+	delete() {
+		throw new Error( 'Must be implemented in a child class.' );
 	}
 
 	_mapUserListFromSessions( issueSessions ) {
