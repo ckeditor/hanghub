@@ -9,14 +9,22 @@ const app = require( 'express' )();
 const { Server } = require( 'http' );
 const http = new Server( app );
 const io = require( 'socket.io' )( http );
+const redisAdapter = require( 'socket.io-redis' );
 const dotenv = require( 'dotenv' );
 dotenv.config( { path: '.env' } );
+
+const config = {
+	host: process.env.REDIS_HOST,
+	port: process.env.REDIS_PORT
+};
 
 const RedisDriver = require( './RedisDriver' );
 const SessionRedisRepository = require( './SessionRedisRepository' );
 
-const redisDriver = new RedisDriver( io, process.env.REDIS_HOST, process.env.REDIS_PORT );
+const redisDriver = new RedisDriver( config );
 redisDriver.connect();
+
+io.adapter( redisAdapter( config ) );
 
 const repository = new SessionRedisRepository( redisDriver.client );
 
