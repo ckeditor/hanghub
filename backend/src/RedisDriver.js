@@ -3,24 +3,18 @@ const redisAdapter = require( 'socket.io-redis' );
 
 module.exports = class RedisDriver {
 	constructor( io, host, port ) {
-		this.io = io;
+		this._io = io;
 		this._config = {
 			host,
 			port
 		};
-		this._client = null;
-	}
-
-	get client() {
-		return this._client;
+		this.client = null;
 	}
 
 	connect() {
-		const client = new Redis( this._config );
+		this.client = new Redis( this._config );
 
-		this.io.adapter( redisAdapter( this._config ) );
-
-		this._client = client;
+		this._io.adapter( redisAdapter( this._config ) );
 	}
 };
 
