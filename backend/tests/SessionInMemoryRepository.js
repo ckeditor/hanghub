@@ -1,3 +1,8 @@
+/**
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+ * This file is licensed under the terms of the MIT License (see LICENSE.md).
+ */
+
 const { expect } = require( 'chai' );
 const InMemoryDriver = require( '../src/InMemoryDriver' );
 const SessionRepository = require( '../src/SessionRepository' );

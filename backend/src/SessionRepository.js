@@ -1,3 +1,8 @@
+/**
+ * @license Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+ * This file is licensed under the terms of the MIT License (see LICENSE.md).
+ */
+
 // Priorities are set from the lowest to the highest.
 const STATE_PRIORITES = [ 'away', 'viewing', 'commenting', 'editing', 'merging' ];
 
