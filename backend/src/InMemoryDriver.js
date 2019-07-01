@@ -1,14 +1,10 @@
-const SessionBaseRepository = require( './SessionBaseRepository' );
-
-module.exports = class SessionInMemoryRepository extends SessionBaseRepository {
+module.exports = class InMemoryDriver {
 	constructor() {
-		super();
 		this._db = {};
 	}
 
 	getAll( issueKey ) {
-		const issueSessions = this._db[ issueKey ];
-		return this._mapUserListFromSessions( issueSessions );
+		return this._db[ issueKey ];
 	}
 
 	set( issueKey, socketId, issueSession ) {

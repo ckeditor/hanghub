@@ -10,6 +10,8 @@ const { Server } = require( 'http' );
 const http = new Server( app );
 const io = require( 'socket.io' )( http );
 const redisAdapter = require( 'socket.io-redis' );
+const RedisDriver = require( './RedisDriver' );
+const SessionRepository = require( './SessionRepository' );
 const dotenv = require( 'dotenv' );
 dotenv.config( { path: '.env' } );
 
@@ -18,15 +20,12 @@ const config = {
 	port: process.env.REDIS_PORT
 };
 
-const RedisDriver = require( './RedisDriver' );
-const SessionRedisRepository = require( './SessionRedisRepository' );
-
 const redisDriver = new RedisDriver( config );
 redisDriver.connect();
 
 io.adapter( redisAdapter( config ) );
 
-const repository = new SessionRedisRepository( redisDriver.client );
+const repository = new SessionRepository( redisDriver );
 
 io.on( 'connection', socket => {
 	const timestamp = new Date();
@@ -69,3 +68,8 @@ async function broadcastUsers( issueKey ) {
 
 	io.in( issueKey ).emit( 'refresh', users );
 }
+
+process.on( 'SIGTERM', () => {
+	redisDriver.disconnect();
+	process.exit( 0 );
+} );

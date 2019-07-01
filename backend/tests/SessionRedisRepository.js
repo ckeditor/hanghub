@@ -1,26 +1,29 @@
 const { expect } = require( 'chai' );
-const app = require( 'express' )();
-const { Server } = require( 'http' );
-const http = new Server( app );
-const io = require( 'socket.io' )( http );
+const Redis = require( 'ioredis' );
 const RedisDriver = require( '../src/RedisDriver' );
-const SessionRedisRepository = require( '../src/SessionRedisRepository' );
+const SessionRepository = require( '../src/SessionRepository' );
 
 describe( 'SessionRedisRepository', () => {
 	const issueKey = 'test/repository:issue/1';
-	let repository, redisDriver;
+	const config = {
+		host: 'localhost',
+		port: '6379'
+	};
+	let repository, redisDriver, redisClient;
 
 	beforeEach( async () => {
-		redisDriver = new RedisDriver( io, 'localhost', '6379' );
+		redisClient = new Redis( config );
+		await redisClient.flushall();
 
+		redisDriver = new RedisDriver( config );
 		redisDriver.connect();
-		await redisDriver.client.flushall();
 
-		repository = new SessionRedisRepository( redisDriver.client );
+		repository = new SessionRepository( redisDriver );
 	} );
 
 	afterEach( async () => {
-		await redisDriver.client.disconnect();
+		await redisClient.disconnect();
+		await redisDriver.disconnect();
 	} );
 
 	describe( 'getAll() ', () => {
@@ -54,7 +57,7 @@ describe( 'SessionRedisRepository', () => {
 			};
 
 			for ( const socketId in sessionsData ) {
-				await redisDriver.client.hset( issueKey, socketId, JSON.stringify( sessionsData[ socketId ] ) );
+				await redisClient.hset( issueKey, socketId, JSON.stringify( sessionsData[ socketId ] ) );
 			}
 
 			expect( await repository.getAll( issueKey ) ).to.deep.equal( [
@@ -72,7 +75,7 @@ describe( 'SessionRedisRepository', () => {
 		} );
 
 		it( 'should return a single connected user when only one user is provided', async () => {
-			await redisDriver.client.hset( issueKey, 'IbVmSiD_LoULFK2yAAAB', JSON.stringify( {
+			await redisClient.hset( issueKey, 'IbVmSiD_LoULFK2yAAAB', JSON.stringify( {
 				id: '123',
 				state: 'commenting'
 			} ) );
@@ -108,7 +111,7 @@ describe( 'SessionRedisRepository', () => {
 
 	describe( 'delete()', () => {
 		it( 'should return a single connected user after insertion and an empty list of connected users after deletion', async () => {
-			await redisDriver.client.hset( issueKey, 'IbVmSiD_LoULFK2yAAAB', JSON.stringify( {
+			await redisClient.hset( issueKey, 'IbVmSiD_LoULFK2yAAAB', JSON.stringify( {
 				id: '123',
 				state: 'commenting'
 			} ) );

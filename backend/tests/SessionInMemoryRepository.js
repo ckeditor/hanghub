@@ -1,16 +1,18 @@
 const { expect } = require( 'chai' );
-const SessionInMemoryRepository = require( '../src/SessionInMemoryRepository' );
+const InMemoryDriver = require( '../src/InMemoryDriver' );
+const SessionRepository = require( '../src/SessionRepository' );
 
 describe( 'SessionInMemoryRepository', () => {
 	const issueKey = 'test/repository:issue/1';
 	let repository;
 
 	beforeEach( () => {
-		repository = new SessionInMemoryRepository();
+		const inMemoryDriver = new InMemoryDriver();
+		repository = new SessionRepository( inMemoryDriver );
 	} );
 
 	describe( 'getAll()', () => {
-		it( 'should return a sorted ascending list of connected users', () => {
+		it( 'should return a sorted ascending list of connected users', async () => {
 			const sessionsData = {
 				IbVmSiD_LoULFK2yAAAB: {
 					id: '123',
@@ -40,10 +42,10 @@ describe( 'SessionInMemoryRepository', () => {
 			};
 
 			for ( const socketId in sessionsData ) {
-				repository.set( issueKey, socketId, sessionsData[ socketId ] );
+				await repository.set( issueKey, socketId, sessionsData[ socketId ] );
 			}
 
-			expect( repository.getAll( issueKey ) ).to.deep.equal( [
+			expect( await repository.getAll( issueKey ) ).to.deep.equal( [
 				{
 					id: '123',
 					state: 'editing',
@@ -57,12 +59,12 @@ describe( 'SessionInMemoryRepository', () => {
 			] );
 		} );
 
-		it( 'should return a single connected user when only one user is provided', () => {
+		it( 'should return a single connected user when only one user is provided', async () => {
 			repository.set( issueKey, 'IbVmSiD_LoULFK2yAAAB', {
 				id: '123',
 				state: 'commenting'
 			} );
-			expect( repository.getAll( issueKey ) ).to.deep.equal( [
+			expect( await repository.getAll( issueKey ) ).to.deep.equal( [
 				{
 					id: '123',
 					state: 'commenting'
@@ -70,28 +72,28 @@ describe( 'SessionInMemoryRepository', () => {
 			] );
 		} );
 
-		it( 'should return an empty list of connected users when there are no users provided', () => {
-			expect( repository.getAll( issueKey ) ).to.deep.equal( [] );
+		it( 'should return an empty list of connected users when there are no users provided', async () => {
+			expect( await repository.getAll( issueKey ) ).to.deep.equal( [] );
 		} );
 	} );
 
 	describe( 'delete()', () => {
-		it( 'should return a single connected user after insertion and an empty list of connected users after deletion', () => {
-			repository.set( issueKey, 'IbVmSiD_LoULFK2yAAAB', {
+		it( 'should return a single connected user after insertion and an empty list of connected users after deletion', async () => {
+			await repository.set( issueKey, 'IbVmSiD_LoULFK2yAAAB', {
 				id: '123',
 				state: 'commenting'
 			} );
 
-			expect( repository.getAll( issueKey ) ).to.deep.equal( [
+			expect( await repository.getAll( issueKey ) ).to.deep.equal( [
 				{
 					id: '123',
 					state: 'commenting'
 				}
 			] );
 
-			repository.delete( issueKey, 'IbVmSiD_LoULFK2yAAAB' );
+			await repository.delete( issueKey, 'IbVmSiD_LoULFK2yAAAB' );
 
-			expect( repository.getAll( issueKey ) ).to.deep.equal( [] );
+			expect( await repository.getAll( issueKey ) ).to.deep.equal( [] );
 		} );
 	} );
 } );
