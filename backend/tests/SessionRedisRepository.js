@@ -105,12 +105,7 @@ describe( 'SessionRedisRepository', () => {
 				state: 'commenting'
 			} );
 
-			expect( await repository.getAll( issueKey ) ).to.deep.equal( [
-				{
-					id: '123',
-					state: 'commenting'
-				}
-			] );
+			expect( Object.keys( await redisClient.hgetall( issueKey ) ).length ).to.equal( 1 );
 		} );
 	} );
 
@@ -121,16 +116,11 @@ describe( 'SessionRedisRepository', () => {
 				state: 'commenting'
 			} ) );
 
-			expect( await repository.getAll( issueKey ) ).to.deep.equal( [
-				{
-					id: '123',
-					state: 'commenting'
-				}
-			] );
+			expect( Object.keys( await redisClient.hgetall( issueKey ) ).length ).to.equal( 1 );
 
 			await repository.delete( issueKey, 'IbVmSiD_LoULFK2yAAAB' );
 
-			expect( await repository.getAll( issueKey ) ).to.deep.equal( [] );
+			expect( Object.keys( await redisClient.hgetall( issueKey ) ).length ).to.equal( 0 );
 		} );
 	} );
 } );
