@@ -154,6 +154,9 @@ export default class HangHub {
 			hangHubElement.className = 'discussion-sidebar-item';
 			hangHubElement.id = 'hanghub';
 
+			// GitHub sets top margin on discussion-sidebar-item only on PR pages. It needs to be set also on issues.
+			hangHubElement.style.marginTop = '15px';
+
 			sidebarElement.appendChild( hangHubElement );
 		}
 
