@@ -9,23 +9,33 @@ const app = require( 'express' )();
 const { Server } = require( 'http' );
 const http = new Server( app );
 const io = require( 'socket.io' )( http );
-const redisAdapter = require( 'socket.io-redis' );
-const RedisDriver = require( './RedisDriver' );
+
 const SessionRepository = require( './SessionRepository' );
 const dotenv = require( 'dotenv' );
 dotenv.config( { path: '.env' } );
 
-const config = {
+const redisConfig = {
 	host: process.env.REDIS_HOST,
 	port: process.env.REDIS_PORT
 };
 
-const redisDriver = new RedisDriver( config );
-redisDriver.connect();
+let driver;
 
-io.adapter( redisAdapter( config ) );
+if ( redisConfig.host && redisConfig.port ) {
+	const redisAdapter = require( 'socket.io-redis' );
+	const RedisDriver = require( './RedisDriver' );
 
-const repository = new SessionRepository( redisDriver );
+	driver = new RedisDriver( redisConfig );
+	driver.connect();
+
+	io.adapter( redisAdapter( redisConfig ) );
+} else {
+	const InMemoryDriver = require( './InMemoryDriver' );
+
+	driver = new InMemoryDriver();
+}
+
+const repository = new SessionRepository( driver );
 
 io.on( 'connection', socket => {
 	const timestamp = new Date();
@@ -70,6 +80,9 @@ async function broadcastUsers( issueKey ) {
 }
 
 process.on( 'SIGTERM', () => {
-	redisDriver.disconnect();
+	if ( driver.disconnect ) {
+		driver.disconnect();
+	}
+
 	process.exit( 0 );
 } );
