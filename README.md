@@ -70,11 +70,19 @@ cd hanghub/backend
 npm i
 ```
 
-#### 2. Deploy
+#### 2. Create and fill `.env` file
+
+The backend configuration is loaded from `.env` file based on `.env.example`. You need to set:
+
+* DEFAULT_PORT
+* REDIS_HOST
+* REDIS_PORT
+
+#### 3. Deploy
 
 Deploy the content of the `backend` directory to your server.
 
-#### 3. Change the `SOCKET_URL`
+#### 4. Change the `SOCKET_URL`
 
 You now need to replace the `SOCKET_URL` in `frontend/src/index.js` and add it to the `frontend/manifest.json` file in the `permissions` array. After that, rebuild the frontend part of the project using `npm run build`.
 

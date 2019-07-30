@@ -12,6 +12,7 @@ export default class HangHub {
 		this._socket = io( socketUrl, { autoConnect: false } );
 		this._repoName = null;
 		this._issueId = null;
+		this._pageType = null;
 		this._user = null;
 		this._isRunning = false;
 		this._observer = null;
@@ -37,7 +38,6 @@ export default class HangHub {
 
 		this._user = {
 			login: userLogin,
-			avatar: `https://avatars2.githubusercontent.com/u/${ userId }`,
 			id: userId || null,
 			state: this._getState()
 		};
@@ -112,7 +112,7 @@ export default class HangHub {
 		}
 
 		if ( this._hasUserLeftPage( repoName, issueId ) ) {
-			this._socket.emit( 'removeUser', { repoName: this._repoName, issueId: this._issueId } );
+			this._socket.emit( 'disconnect', { repoName: this._repoName, pageType: this._pageType, issueId: this._issueId } );
 
 			this._repoName = null;
 			this._issueId = null;
@@ -122,9 +122,10 @@ export default class HangHub {
 
 		this._repoName = repoName;
 		this._issueId = issueId;
+		this._pageType = pageType;
 		this._user.state = newState;
 
-		this._socket.emit( 'setUser', { repoName: this._repoName, issueId: this._issueId, user: this._user }, ( err, users ) => {
+		this._socket.emit( 'setUser', { repoName: this._repoName, pageType: this._pageType, issueId: this._issueId, user: this._user }, ( err, users ) => {
 			this._renderCollaborators( users, pageType );
 			this._renderCollaboratorCounter( users );
 			this._updatePosition();
