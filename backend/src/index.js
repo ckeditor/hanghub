@@ -65,8 +65,10 @@ io.on( 'connection', socket => {
 	} );
 } );
 
-http.listen( process.env.DEFAULT_PORT, () => {
-	console.log( 'listening on *:' + process.env.DEFAULT_PORT );
+const port = process.env.PORT || 3000;
+
+http.listen( port, () => {
+	console.log( 'listening on *:' + port );
 } );
 
 function createIssueKey( repoName, pageType, issueId ) {
