@@ -25,6 +25,7 @@ chrome.storage.sync.get( 'config', ( { config } ) => {
 
 		return hangHub.start();
 	}
+
 	if ( canStart( config, hostname ) ) {
 		hangHub.start();
 	}
@@ -44,7 +45,8 @@ function canStart( config, hostname ) {
 	}
 
 	// Check if user opened page without required permissions.
-	if ( !document.getElementById( 'partial-discussion-header' ) ) {
+	// `img.js-plaxify` is a part of the 404 page.
+	if ( document.querySelector( 'img.js-plaxify' ) ) {
 		return false;
 	}
 
