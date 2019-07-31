@@ -45,6 +45,8 @@ function canStart( config, hostname ) {
 	}
 
 	// Check if user opened page without required permissions.
+	// `img.js-plaxify` is a part of the 404 page. This page is built with some img tags.
+	// The second element of this array is the only which contains information about 404 error.
 	if ( document.querySelectorAll( 'img.js-plaxify' )[ 1 ] && document.querySelectorAll( 'img.js-plaxify' )[ 1 ].alt.startsWith( '404' ) ) {
 		return false;
 	}
