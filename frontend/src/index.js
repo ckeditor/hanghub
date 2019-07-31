@@ -25,6 +25,7 @@ chrome.storage.sync.get( 'config', ( { config } ) => {
 
 		return hangHub.start();
 	}
+
 	if ( canStart( config, hostname ) ) {
 		hangHub.start();
 	}
