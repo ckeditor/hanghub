@@ -39,6 +39,7 @@ function canStart( config, hostname ) {
 	const isDisabledRepository = config.disabledRepositories.includes( repository );
 	const isEnabledOrganization = config.enabledOrganizations.includes( organization );
 	const isEnabledRepository = config.enabledRepositories.includes( repository );
+
 	if ( hostname !== 'github.com' ) {
 		return false;
 	}
