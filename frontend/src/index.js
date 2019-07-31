@@ -38,13 +38,12 @@ function canStart( config, hostname ) {
 	const isDisabledRepository = config.disabledRepositories.includes( repository );
 	const isEnabledOrganization = config.enabledOrganizations.includes( organization );
 	const isEnabledRepository = config.enabledRepositories.includes( repository );
-
 	if ( hostname !== 'github.com' ) {
 		return false;
 	}
 
 	// Check if user opened page without required permissions.
-	if ( !document.getElementById( 'partial-discussion-header' ) ) {
+	if ( document.querySelectorAll( 'img.js-plaxify' )[ 1 ] && document.querySelectorAll( 'img.js-plaxify' )[ 1 ].alt.startsWith( '404' ) ) {
 		return false;
 	}
 
