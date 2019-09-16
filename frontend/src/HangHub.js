@@ -178,7 +178,7 @@ export default class HangHub {
 			collaboratorCounter = document.createElement( 'span' );
 			collaboratorCounter.id = 'collaborator-counter';
 
-			issueHeader.appendChild( collaboratorCounter );
+			issueHeader.insertBefore( collaboratorCounter, issueHeader.querySelector( '.position-relative' ) );
 		}
 		collaboratorCounter.textContent = ` · ${ this._getNumberOfUsersMessage( users ) }`;
 	}
