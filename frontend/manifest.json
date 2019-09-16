@@ -1,6 +1,6 @@
 {
   "name": "HangHub",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "HangHub allows you to see who is viewing or commenting on the same GitHub issue or pull request as you in real time.",
   "permissions": [
     "activeTab",
