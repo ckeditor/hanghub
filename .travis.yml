@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: xenial
 addons:
   apt:
     sources:
@@ -7,11 +7,10 @@ addons:
     packages:
       - google-chrome-stable
 language: node_js
+services:
+  - xvfb
 node_js:
   - "8"
-before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
 install:
   - npm install
 script:
