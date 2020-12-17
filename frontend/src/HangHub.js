@@ -13,9 +13,11 @@ export default class HangHub {
 		this._repoName = null;
 		this._issueId = null;
 		this._pageType = null;
+		this._subPage = null;
 		this._user = null;
 		this._isRunning = false;
 		this._observer = null;
+		this._connectedUsers = [];
 		this._boundInteractWithSocket = this._interactWithSocket.bind( this );
 		this._boundUpdatePosition = this._updatePosition.bind( this );
 	}
@@ -44,7 +46,7 @@ export default class HangHub {
 
 		this._observer = new window.MutationObserver( debounce( () => {
 			this._interactWithSocket();
-		}, 750 ) );
+		}, 500 ) );
 
 		this._observer.observe( document.querySelector( 'body' ), {
 			childList: true,
@@ -70,7 +72,7 @@ export default class HangHub {
 		const collaboratorCounter = document.getElementById( 'collaborator-counter' );
 
 		// For the case when the user enables and disables the plugin functionality before the HangHub or collaborator counter element
-		//  is rendered.
+		// is rendered.
 		if ( hangHubElement ) {
 			hangHubElement.remove();
 		}
@@ -100,16 +102,9 @@ export default class HangHub {
 	}
 
 	_interactWithSocket() {
-		const pathRegExp = /\/(\S+)\/(issues|pull)\/(\d+)/g;
-		const [ , repoName, pageType, issueId ] = pathRegExp.exec( window.location.pathname ) || [];
+		const pathRegExp = /\/(\S+)\/(issues|pull)\/(\d+)\/?(\S+)?/g;
+		const [ , repoName, pageType, issueId, subpage ] = pathRegExp.exec( window.location.pathname ) || [];
 		const newState = this._getState();
-
-		if ( this._isUserOnTheSamePage( repoName, issueId, newState ) ) {
-			// Avoid redundant repainting.
-			if ( document.getElementById( 'hanghub' ) ) {
-				return;
-			}
-		}
 
 		if ( this._hasUserLeftPage( repoName, issueId ) ) {
 			this._socket.emit( 'disconnect', { repoName: this._repoName, pageType: this._pageType, issueId: this._issueId } );
@@ -123,6 +118,7 @@ export default class HangHub {
 		this._repoName = repoName;
 		this._issueId = issueId;
 		this._pageType = pageType;
+		this._subpage = subpage;
 		this._user.state = newState;
 
 		this._socket.emit( 'setUser', { repoName: this._repoName, pageType: this._pageType, issueId: this._issueId, user: this._user }, ( err, users ) => {
@@ -132,10 +128,34 @@ export default class HangHub {
 		} );
 
 		this._socket.on( 'refresh', users => {
-			this._renderCollaborators( users, pageType );
-			this._renderCollaboratorCounter( users );
-			this._updatePosition();
+			if ( ( !this._elementsRendered() || this._usersChanged( users ) ) && !this._subpage ) {
+				this._renderCollaborators( users, pageType );
+				this._renderCollaboratorCounter( users );
+				this._updatePosition();
+
+				this._connectedUsers = [ ...users ];
+			}
 		} );
+	}
+
+	_elementsRendered() {
+		return document.getElementById( 'hanghub' ) && document.getElementById( 'collaborator-counter' );
+	}
+
+	_usersChanged( users ) {
+		if ( this._connectedUsers.length !== users.length ) {
+			return true;
+		}
+
+		for ( const connectedUser of this._connectedUsers ) {
+			const userToCompare = users.find( user => user.id === connectedUser.id );
+
+			if ( userToCompare.state !== connectedUser.state ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	_renderCollaborators( users, pageType ) {
@@ -169,7 +189,7 @@ export default class HangHub {
 		let collaboratorCounter = document.getElementById( 'collaborator-counter' );
 
 		if ( !collaboratorCounter ) {
-			const issueHeader = document.querySelector( '.gh-header-meta .TableObject-item--primary' );
+			const issueHeader = document.querySelector( '.gh-header-meta .flex-auto.min-width-0.mb-2' );
 
 			if ( !issueHeader ) {
 				return;
@@ -178,8 +198,9 @@ export default class HangHub {
 			collaboratorCounter = document.createElement( 'span' );
 			collaboratorCounter.id = 'collaborator-counter';
 
-			issueHeader.insertBefore( collaboratorCounter, issueHeader.querySelector( '.position-relative' ) );
+			issueHeader.appendChild( collaboratorCounter );
 		}
+
 		collaboratorCounter.textContent = ` · ${ this._getNumberOfUsersMessage( users ) }`;
 	}
 
@@ -199,7 +220,7 @@ export default class HangHub {
 
 	_isUserCommenting() {
 		const newCommentField = document.querySelector( '#new_comment_field' );
-		const newInlineCommentElements = document.querySelectorAll( 'textarea[id*="new_inline_comment_discussion"]' );
+		const newInlineCommentElements = document.querySelectorAll( 'textarea[id*="new_inline_comment_discussion"], textarea[id*="new_inline_comment"]' );
 
 		if ( newCommentField && newCommentField.value ) {
 			return true;
@@ -226,10 +247,6 @@ export default class HangHub {
 
 	_hasUserLeftPage( repoName, issueId ) {
 		return !repoName || !issueId;
-	}
-
-	_isUserOnTheSamePage( repoName, issueId, state ) {
-		return this._repoName == repoName && this._issueId == issueId && this._user.state == state;
 	}
 
 	_getNumberOfUsersMessage( users ) {
