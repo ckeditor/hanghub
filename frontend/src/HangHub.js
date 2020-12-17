@@ -133,7 +133,7 @@ export default class HangHub {
 				this._renderCollaboratorCounter( users );
 				this._updatePosition();
 
-				this._connectedUsers = [ ...users ];
+				this._connectedUsers = users;
 			}
 		} );
 	}
