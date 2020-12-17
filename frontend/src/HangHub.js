@@ -44,7 +44,7 @@ export default class HangHub {
 
 		this._observer = new window.MutationObserver( debounce( () => {
 			this._interactWithSocket();
-		}, 70 ) );
+		}, 750 ) );
 
 		this._observer.observe( document.querySelector( 'body' ), {
 			childList: true,
