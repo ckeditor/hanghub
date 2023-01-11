@@ -4,3 +4,4 @@ package-lock.json
 frontend/build/
 .env
 data/
+.DS_Store
