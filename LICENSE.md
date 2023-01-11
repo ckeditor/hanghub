@@ -2,7 +2,7 @@ Software License Agreement
 ==========================
 
 **HangHub** - https://github.com/ckeditor/hanghub <br>
-Copyright (c) 2003-2019, [CKSource](http://cksource.com) Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2023, [CKSource](http://cksource.com) Holding sp. z o.o.. All rights reserved.
 
 Licensed under the terms of the MIT License
 
