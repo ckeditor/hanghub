@@ -35,6 +35,12 @@ module.exports = class RedisDriver {
 	}
 
 	async delete( issueKey, socketId ) {
+		const exists = await this._client.exists( issueKey );
+
+		if ( !exists ) {
+			return;
+		}
+
 		await this._client.hdel( issueKey, socketId );
 	}
 };

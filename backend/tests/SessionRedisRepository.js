@@ -122,6 +122,12 @@ describe( 'SessionRedisRepository', () => {
 
 			expect( Object.keys( await redisClient.hgetall( issueKey ) ).length ).to.equal( 0 );
 		} );
+
+		it( 'should not crash if there is not matching key', async () => {
+			await repository.delete( 'invalidKey', 'IbVmSiD_LoULFK2yAAAB' );
+
+			expect( Object.keys( await redisClient.hgetall( 'invalidKey' ) ).length ).to.equal( 0 );
+		} );
 	} );
 } );
 
