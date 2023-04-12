@@ -21,6 +21,10 @@ module.exports = class InMemoryDriver {
 	}
 
 	delete( issueKey, socketId ) {
+		if ( !this._db[ issueKey ] ) {
+			return;
+		}
+
 		delete this._db[ issueKey ][ socketId ];
 	}
 };

@@ -100,6 +100,12 @@ describe( 'SessionInMemoryRepository', () => {
 
 			expect( await repository.getAll( issueKey ) ).to.deep.equal( [] );
 		} );
+
+		it( 'should not crash if there is not matching key', async () => {
+			await repository.delete( 'invalidKey', 'IbVmSiD_LoULFK2yAAAB' );
+
+			expect( await repository.getAll( 'invalidKey' ) ).to.deep.equal( [] );
+		} );
 	} );
 } );
 
