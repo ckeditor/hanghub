@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  cs-orb: cksource/cs-orb@1.0.7
+  cs-orb: ckeditor/cs-orb@1.1.0
 
 workflows:
   release:
