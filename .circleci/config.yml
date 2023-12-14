@@ -1,0 +1,16 @@
+version: 2.1
+
+orbs:
+  cs-orb: cksource/cs-orb@1.0.7
+
+workflows:
+  release:
+    jobs:
+      - cs-orb/release_to_ecr:
+          image_name: it-hanghub-service
+          build_context: ./backend
+          dockerfile_path: ./backend/Dockerfile
+          version_callback: echo $(node -pe "require('./backend/package.json').version")
+          # filters:
+          #   branches:
+          #     only: [master]
