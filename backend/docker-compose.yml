@@ -20,7 +20,10 @@ services:
     restart: always
   hanghub1:
     image: hanghub:latest
+    build: .
   hanghub2:
     image: hanghub:latest
+    build: .
   hanghub3:
     image: hanghub:latest
+    build: .
