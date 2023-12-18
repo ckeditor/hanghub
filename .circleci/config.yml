@@ -11,6 +11,6 @@ workflows:
           build_context: ./backend
           dockerfile_path: ./backend/Dockerfile
           version_callback: echo $(node -pe "require('./backend/package.json').version")
-          # filters:
-          #   branches:
-          #     only: [master]
+          filters:
+            branches:
+              only: [master]
