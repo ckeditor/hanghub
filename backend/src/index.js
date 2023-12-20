@@ -71,6 +71,10 @@ http.listen( port, () => {
 	console.log( 'listening on *:' + port );
 } );
 
+app.get('/healthz', ( _, res ) => {
+	res.send('ok');
+} );
+
 function createIssueKey( repoName, pageType, issueId ) {
 	return `${ repoName }:${ pageType }/${ issueId }`;
 }
