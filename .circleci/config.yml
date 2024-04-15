@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  cs-orb: ckeditor/cs-orb@1.1.0
+  cs-orb: ckeditor/cs-orb@1.2
 
 workflows:
   release:
@@ -11,6 +11,7 @@ workflows:
           build_context: ./backend
           dockerfile_path: ./backend/Dockerfile
           version_callback: echo $(node -pe "require('./backend/package.json').version")
+          use_oidc_role: true
           filters:
             branches:
               only: [master]
